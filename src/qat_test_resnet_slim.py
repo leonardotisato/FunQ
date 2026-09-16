@@ -6,6 +6,7 @@ Default artifact:
 
 import csv
 import json
+import math
 import os
 import sys
 import warnings
@@ -38,7 +39,8 @@ from qat_test_resnet_trim import (  # noqa: E402
     teacher_train_transform,
 )
 from utils.dataset import FundusClsDataset, prepare_dataframes, trim_fundus_black_border  # noqa: E402
-from utils.model import ResNet18Classifier  # noqa: E402
+from utils.kd_sweep import build_teacher_model, resolve_experiment_paths, resolve_teacher_spec  # noqa: E402
+from utils.qat_sweep import file_sha256, resolve_qat_run, run_provenance, valid_metrics, validate_weight_loading  # noqa: E402
 from utils.quant_test_resnet_slim import (  # noqa: E402
     QuantTestResNetSlim,
     load_test_resnet_slim_quant_weights,
@@ -56,6 +58,7 @@ from utils.transforms import make_strong_train_transform, make_test_transform  #
 
 DEFAULT_STUDENT_RESOLUTION = 160
 DEFAULT_QAT_ARTIFACT = "test_resnet_slim128x64_trim160_6w6a_qat.pth"
+QAT_SWEEP_PROTOCOL_VERSION = 1
 
 
 def resolve_slim_qat_run(
@@ -64,25 +67,13 @@ def resolve_slim_qat_run(
     act_bits: int,
     layer3_out: int = DEFAULT_LAYER3_OUT,
     layer4_out: int = DEFAULT_LAYER4_OUT,
+    teacher_mode=None,
+    seed=None,
+    experiment_tag=None,
 ):
-    bit_tag = model_tag(weight_bits, act_bits)
-    trim_tag = f"trim{student_resolution}"
     variant = slim_variant_tag(layer3_out, layer4_out)
-    run_tag = f"{variant}_{trim_tag}_{bit_tag}"
-    fp32_run_tag = f"{variant}_{trim_tag}"
-    return {
-        "bit_tag": bit_tag,
-        "trim_tag": trim_tag,
-        "variant": variant,
-        "run_tag": run_tag,
-        "fp32_checkpoint_name": f"test_resnet_{variant}_fp32_kd_{trim_tag}_ft.pth",
-        "results_dir_name": f"qat_test_resnet_{run_tag}",
-        "checkpoint_name": f"test_resnet_{run_tag}_qat.pth",
-        "report_name": f"qat_test_resnet_{run_tag}_report.json",
-        "log_name": f"qat_test_resnet_{run_tag}_log.csv",
-        "model_type": f"test_resnet_{run_tag}_qat",
-        "fp32_run_tag": fp32_run_tag,
-    }
+    return resolve_qat_run(f"test_resnet_{variant}", student_resolution, weight_bits, act_bits,
+                           teacher_mode, seed, experiment_tag)
 
 
 @hydra.main(config_path="../config", config_name="config", version_base=None)
@@ -100,6 +91,8 @@ def main(cfg: DictConfig) -> None:
     layer4_out = int(OmegaConf.select(cfg, "slim_layer4_out", default=DEFAULT_LAYER4_OUT))
     student_test_transform = make_test_transform(student_resolution)
     student_train_transform = make_strong_train_transform(student_resolution)
+    paths = resolve_experiment_paths(cfg)
+    teacher_spec = resolve_teacher_spec(cfg, paths)
 
     run_cfg = resolve_slim_qat_run(
         student_resolution=student_resolution,
@@ -107,13 +100,27 @@ def main(cfg: DictConfig) -> None:
         act_bits=act_bits,
         layer3_out=layer3_out,
         layer4_out=layer4_out,
+        teacher_mode=teacher_spec["mode"],
+        seed=int(cfg.RANDOM_SEED),
+        experiment_tag=paths.experiment_tag,
     )
 
-    results_dir = os.path.join(cfg.results_dir, run_cfg["results_dir_name"])
+    teacher_path = teacher_spec["checkpoint_path"]
+    student_init_checkpoint = OmegaConf.select(cfg, "warm_start_checkpoint", default=None)
+    if paths.experiment_tag and not student_init_checkpoint:
+        raise ValueError("A QAT sweep requires an explicit matching warm_start_checkpoint")
+    student_init_checkpoint = student_init_checkpoint or os.path.join(cfg.models_dir, run_cfg["fp32_checkpoint_name"])
+    for required in (teacher_path, student_init_checkpoint):
+        if not os.path.isfile(required):
+            raise FileNotFoundError(f"Required checkpoint not found: {required}")
+
+    results_dir = os.path.join(paths.results_root, run_cfg["results_dir_name"])
     os.makedirs(results_dir, exist_ok=True)
-    os.makedirs(cfg.models_dir, exist_ok=True)
+    os.makedirs(paths.models_dir, exist_ok=True)
+    OmegaConf.save(cfg, os.path.join(results_dir, "resolved_config.yaml"), resolve=True)
 
     train_df, val_df, test_df = prepare_dataframes(cfg)
+    provenance = run_provenance(cfg, teacher_spec, student_init_checkpoint, train_df, val_df, test_df)
 
     train_dataset = DualResTrimDataset(
         train_df,
@@ -151,12 +158,7 @@ def main(cfg: DictConfig) -> None:
         calib_dataset, batch_size=cfg.batch_size, shuffle=False, num_workers=4, pin_memory=True
     )
 
-    teacher_path = os.path.join(cfg.models_dir, "resnet18_from_resnet50_fp32_kd.pth")
-    if not os.path.exists(teacher_path):
-        print(f"[ERROR] Teacher checkpoint not found: {teacher_path}")
-        return
-
-    teacher = ResNet18Classifier(nr_classes=cfg.nr_classes, pretrained=False)
+    teacher = build_teacher_model(teacher_spec["arch"], nr_classes=cfg.nr_classes)
     teacher.load_state_dict(torch.load(teacher_path, map_location="cpu"))
     teacher.to(device)
     teacher.eval()
@@ -176,29 +178,10 @@ def main(cfg: DictConfig) -> None:
     n_params = sum(p.numel() for p in student.parameters())
     print(f"Student parameters: {n_params:,}")
 
-    student_init_checkpoint = OmegaConf.select(cfg, "warm_start_checkpoint", default=None)
-    if student_init_checkpoint is None:
-        student_init_checkpoint = os.path.join(cfg.models_dir, run_cfg["fp32_checkpoint_name"])
-    if not os.path.exists(student_init_checkpoint):
-        print(f"[ERROR] Student init checkpoint not found: {student_init_checkpoint}")
-        print("Run train_test_resnet_slim first.")
-        return
-
     print(f"\nLoading slim student init weights from: {student_init_checkpoint}")
     missing, unexpected = load_test_resnet_slim_quant_weights(student, student_init_checkpoint)
-    non_quant_missing = [
-        key for key in missing
-        if not any(token in key for token in [
-            "tensor_quant", "scaling_impl", "int_scaling_impl", "zero_point",
-            "msb_clamp_bit_width_impl", "act_quant", "weight_quant", "bias_quant",
-        ])
-    ]
-    if non_quant_missing:
-        print(f"[WARNING] Non-quantizer keys missing: {non_quant_missing}")
-    if unexpected:
-        print(f"[WARNING] Unexpected keys found: {unexpected}")
-    else:
-        print("Weight loading OK: only Brevitas quantizer params are missing.")
+    validate_weight_loading(missing, unexpected)
+    print("Weight loading OK: all model weights loaded.")
 
     student.to(device)
 
@@ -282,6 +265,8 @@ def main(cfg: DictConfig) -> None:
             print(f"Early stopping at epoch {epoch} (patience={PATIENCE})")
             break
 
+    if best_state is None or not math.isfinite(best_val_loss):
+        raise RuntimeError("QAT did not produce a finite validation-selected model")
     if best_state is not None:
         student.load_state_dict(best_state)
         print(
@@ -290,7 +275,7 @@ def main(cfg: DictConfig) -> None:
         )
     student.to(device)
 
-    qat_ckpt_path = os.path.join(cfg.models_dir, run_cfg["checkpoint_name"])
+    qat_ckpt_path = os.path.join(paths.models_dir, run_cfg["checkpoint_name"])
     torch.save(student.state_dict(), qat_ckpt_path)
     print(f"QAT checkpoint saved -> {qat_ckpt_path}")
 
@@ -318,15 +303,23 @@ def main(cfg: DictConfig) -> None:
         "best_val_f1": round(best_val_f1, 4),
         "best_val_loss": round(best_val_loss, 4),
         "checkpoint": qat_ckpt_path,
+        "checkpoint_sha256": file_sha256(qat_ckpt_path),
         "student_init_checkpoint": student_init_checkpoint,
-        "teacher": "resnet18_from_resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+        "student_init_mode": "fp32_checkpoint",
+        "teacher": f"{teacher_spec['checkpoint_name']} (512x512 full-image strong train / test eval)",
         "student_resolution": student_resolution,
         "teacher_resolution": 512,
         "input_size": [1, 3, student_resolution, student_resolution],
         "kd_temperature": KD_TEMPERATURE,
         "kd_alpha": KD_ALPHA,
         "test_metrics": test_metrics,
+        "qat_hyperparameters": {"lr": QAT_LR, "max_epochs": QAT_EPOCHS,
+                                "weight_decay": QAT_WEIGHT_DECAY, "patience": PATIENCE,
+                                "calibration_batches": CALIB_BATCHES, "bn_freeze_epoch": BN_FREEZE_EPOCH},
+        **provenance,
     }
+    if not valid_metrics(report):
+        raise RuntimeError("QAT evaluation produced invalid metrics; completion report was not saved")
     report_path = os.path.join(results_dir, run_cfg["report_name"])
     with open(report_path, "w") as f:
         json.dump(report, f, indent=2)
