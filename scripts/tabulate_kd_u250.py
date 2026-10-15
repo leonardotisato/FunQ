@@ -1,7 +1,7 @@
-"""Reproduce the FP32 KD figures and inventory FINN U250 estimates.
+"""Tabulate the FP32 KD sweep and inventory the FINN U250 builds (figures: scripts/make_figures.py).
 
-Run from any directory: python scripts/plot_kd_u250_results.py
-Requires numpy, scipy and matplotlib; no training libraries or checkpoints.
+Run from any directory: python scripts/tabulate_kd_u250.py
+Requires numpy and scipy; no training libraries or checkpoints.
 Reads only the tracked summaries in results/ (fp32_kd_sweep, legacy, hw); see analysis/kd_u250/README.md.
 """
 
@@ -15,13 +15,7 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
 from scipy.stats import t
 
 
@@ -29,8 +23,6 @@ ROOT = Path(__file__).resolve().parents[1]
 METRICS = ("accuracy_overall", "f1_weighted", "precision_weighted", "recall_weighted")
 GROUP = ("experiment", "architecture", "resolution", "teacher")
 TEACHERS = ("r18_ta", "r50_direct")
-COLORS = {"r18_ta": "#27658B", "r50_direct": "#BE781F"}
-TEACHER_LABELS = {"r18_ta": "ResNet18 teacher assistant", "r50_direct": "ResNet50 direct teacher"}
 ARCH_LABELS = {"test_resnet": "TestResNet", "test_resnet_slim128x64": "TestResNet slim 128/64"}
 
 
@@ -222,106 +214,6 @@ def collect_finn(provenance):
     return rows
 
 
-def save_figure(fig, out, name):
-    for extension in ("png", "svg"):
-        fig.savefig(out / f"{name}.{extension}", dpi=200, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-
-
-def plot_fp32(runs, summaries, out):
-    plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 11,
-                         "axes.spines.top": False, "axes.spines.right": False,
-                         "axes.labelcolor": "#263238", "text.color": "#263238",
-                         "svg.fonttype": "none"})
-    lookup = {tuple(r[k] for k in GROUP) + (r["metric"],): r for r in summaries}
-    for experiment in sorted({r["experiment"] for r in runs}):
-        subset = [r for r in runs if r["experiment"] == experiment]
-        architectures = sorted({r["architecture"] for r in subset})
-        resolutions = sorted({r["resolution"] for r in subset})
-        suffix = "" if len({r["experiment"] for r in runs}) == 1 else f"_{experiment}"
-        for metric, title in (("accuracy_overall", "Test accuracy"), ("f1_weighted", "Test weighted F1"),
-                              ("precision_weighted", "Test weighted precision")):
-            fig, axes = plt.subplots(1, len(architectures), figsize=(12, 5.6), squeeze=False, sharey=True)
-            fig.subplots_adjust(top=0.72, bottom=0.23, wspace=0.12)
-            fig.suptitle(f"Full-precision KD sweep | {title}", x=0.08, ha="left", y=0.97, fontsize=18, weight="bold")
-            fig.text(0.08, 0.90, "Bar = mean   |   Black whisker = nominal 95% t interval   |   Dots = individual runs", fontsize=11)
-            for ax, architecture in zip(axes.flat, architectures):
-                for ti, teacher in enumerate(TEACHERS):
-                    for ri, resolution in enumerate(resolutions):
-                        key = (experiment, architecture, resolution, teacher)
-                        stats = lookup.get(key + (metric,))
-                        if stats is None:
-                            continue
-                        x = ri + (ti - 0.5) * 0.36
-                        mean = stats["mean_pct"]
-                        half = (stats["ci95_high_pct"] - mean) if stats["n"] > 1 else None
-                        ax.bar(x, mean, width=0.32, color=COLORS[teacher], alpha=0.87,
-                               hatch="//" if ti else None, edgecolor=COLORS[teacher], linewidth=0.7, zorder=2)
-                        if half is not None:
-                            ax.errorbar(x, mean, yerr=half, fmt="none", color="#19282F", capsize=5, linewidth=1.4, zorder=4)
-                        values = [r[metric] for r in sorted(subset, key=lambda r: r["seed"])
-                                  if tuple(r[k] for k in GROUP) == key]
-                        ax.scatter(x + np.linspace(-0.09, 0.09, len(values)), values, s=23,
-                                   facecolor="white", edgecolor="#19282F", linewidth=0.8, zorder=5)
-                        ax.text(x, max(max(values), mean + (half or 0)) + 2, f"{mean:.2f}", ha="center", fontsize=10)
-                ax.set_title(ARCH_LABELS[architecture], weight="bold", pad=15)
-                ax.set_xticks(range(len(resolutions)), [f"{r} × {r}" for r in resolutions])
-                ax.set_xlabel("Student input size", labelpad=10)
-                ax.set_ylim(0, 103)
-                ax.set_yticks(range(0, 101, 20))
-                ax.grid(axis="y", color="#DEE3E6", linewidth=0.7, zorder=0)
-                ax.set_axisbelow(True)
-            axes[0, 0].set_ylabel(f"{title} (%)")
-            fig.legend([Patch(facecolor=COLORS[tch], hatch="//" if i else None) for i, tch in enumerate(TEACHERS)],
-                       [TEACHER_LABELS[tch] for tch in TEACHERS], loc="upper center", bbox_to_anchor=(0.52, 0.855),
-                       ncol=2, frameon=False, fontsize=10)
-            seed_sets = sorted({r["seed"] for r in subset})
-            fig.text(0.08, 0.085, f"Seeds: {', '.join(map(str, seed_sets))}. Each seed also changes the patient split; variation combines split and training effects.", fontsize=9)
-            fig.text(0.08, 0.045, "Overlapping splits limit the CI interpretation. Saved test-set bootstrap intervals are separate; SD and n are in the summary CSV.", fontsize=9)
-            save_figure(fig, out, f"fp32_{metric}_95ci{suffix}")
-
-
-def plot_finn(rows, out):
-    rows = sorted(rows, key=lambda r: r["estimated_throughput_fps"])
-    labels = []
-    for r in rows:
-        name = r["topology_from_build_name"].replace("test_resnet_slim128x64", "Slim 128/64").replace("test_resnet", "TestResNet")
-        name = name.replace("_trim", " trim ")
-        if r["preprocessing_identity"] == "legacy_unspecified":
-            name += f" {r['input_resolution_from_driver']} (legacy)"
-        labels.append(f"{name} · {r['weight_bits_from_name']}w{r['act_bits_from_name']}a · {r['target_setting']}")
-    fig, ax = plt.subplots(figsize=(12.8, 9.6))
-    fig.subplots_adjust(left=0.40, right=0.93, top=0.85, bottom=0.14)
-    y = np.arange(len(rows))
-    values = [r["estimated_throughput_fps"] for r in rows]
-    ax.scatter(values, y, color="#27658B", s=42, zorder=3)
-    for i, row in enumerate(rows):
-        target = row["target_fps_from_name"]
-        if target is not None:
-            ax.plot([row["estimated_throughput_fps"], target], [i, i], color="#BFC7CC", linewidth=1.2)
-            ax.scatter(target, i, marker="|", s=100, color="#946517", zorder=4)
-        ax.annotate(f"{row['estimated_throughput_fps']:,.1f}", (row["estimated_throughput_fps"], i),
-                    xytext=(0, 8), textcoords="offset points", ha="center", fontsize=9, color="#174867")
-    ax.set_yticks(y, labels, fontsize=10)
-    ax.set_xscale("log")
-    ax.set_xlim(2, 7000)
-    ax.set_xticks([3, 10, 100, 1000, 5000], ["3", "10", "100", "1,000", "5,000"])
-    ax.set_xlabel("Frames per second (log scale)", labelpad=10)
-    ax.grid(axis="x", color="#DEE3E6", linewidth=0.7)
-    ax.spines[["top", "right", "left"]].set_visible(False)
-    ax.tick_params(axis="y", length=0)
-    fig.suptitle("U250 | FINN estimated accelerator throughput", x=0.06, y=0.97, ha="left", fontsize=18, weight="bold")
-    frequencies = sorted({round(1000 / r["clock_period_ns_inferred_from_estimate"], 3) for r in rows})
-    frequency_label = ", ".join(f"{f:g}" for f in frequencies)
-    fig.text(0.06, 0.923, f"{len(rows)} build reports · analytical estimates at inferred {frequency_label} MHz · accelerator output is a feature vector", fontsize=11)
-    ax.legend([Line2D([], [], marker="o", color="#27658B", linestyle=""),
-               Line2D([], [], marker="|", markersize=13, color="#946517", linestyle="")],
-              ["FINN estimate", "Target from folder name"], loc="lower right", frameon=False, fontsize=10)
-    fig.text(0.06, 0.065, "Source: results/hw/u250/<build>/report/estimate_network_performance.json. These are not measured board or end-to-end FPS.", fontsize=10)
-    fig.text(0.06, 0.036, "Host preprocessing, transfers and the software classifier tail require separate measurement. Accuracy matching is pending.", fontsize=10)
-    save_figure(fig, out, "u250_estimated_fps")
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sweep", type=Path, action="append", help="Folder of FP32 sweep report JSONs; repeat to analyze several separately")
@@ -355,8 +247,6 @@ def main():
                "macro_point_metrics_available": False, "quantized_mean_accuracy_join_performed": False,
                "sources": provenance}
     (out / "data_quality.json").write_text(json.dumps(quality, indent=2) + "\n", encoding="utf-8")
-    plot_fp32(runs, summary, out)
-    plot_finn(finn, out)
     print(json.dumps({"output": str(out), "fp32_runs": len(runs), "fp32_groups": len(summary) // 4,
                       "legacy_qat_reports": len(legacy), "u250_builds": len(finn), "missing_grid_cells": missing}, indent=2))
 

@@ -9,7 +9,7 @@ deployed with FINN on Alveo U250 and Ultra96-v2-G.
 | Path | Contents |
 | --- | --- |
 | `src/` | Training, QAT, export and board-evaluation scripts; `src/finn_build/` holds the FINN build flow |
-| `scripts/` | Seed-sweep launchers and the analysis/plot script |
+| `scripts/` | Seed-sweep launchers, analysis tables and paper figures |
 | `config/config.yaml` | Hydra config shared by all training scripts |
 | `run.sh` / `run_finn.sh` | Launchers for the training container and the FINN container |
 | `results/` | Tracked, small summaries — the source of truth for reported numbers |
@@ -17,7 +17,7 @@ deployed with FINN on Alveo U250 and Ultra96-v2-G.
 | `results/qat_sweep/` | 180 QAT runs: the FP32 grid × 4w4a/6w6a/8w8a |
 | `results/hw/` | Per-build FINN reports for U250 and Ultra96; `builds.csv` lists every bitstream |
 | `results/legacy/` | Earlier single-seed experiments (teachers, first QAT ladders, Ultra96 notes) |
-| `analysis/` | Tables and figures generated from `results/` |
+| `analysis/` | Tables (`kd_u250/`) and paper figures with captions (`figures/`) generated from `results/` |
 | `report/` | LaTeX report |
 | `docs/` | How-tos: `qat_sweep.md`, `finn_builds.md` |
 | `tests/` | Unit tests for the sweep helpers (`python -m unittest discover -s tests`) |
@@ -40,6 +40,6 @@ Large artifacts live only on the VM and are gitignored:
 After a sweep, copy its `*_report.json` files into `results/` and regenerate the analysis:
 
 ```bash
-python scripts/plot_kd_u250_results.py   # writes analysis/kd_u250/
-python scripts/plot_qat_sweep.py         # writes analysis/qat_sweep/
+python scripts/tabulate_kd_u250.py   # FP32 sweep + U250 tables -> analysis/kd_u250/
+python scripts/make_figures.py       # paper figures (PDF/PNG) + captions -> analysis/figures/
 ```

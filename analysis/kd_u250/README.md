@@ -4,12 +4,7 @@
 
 Analyzed `results/fp32_kd_sweep` (sweep `kd_teacher_sweep_20260703_121750`): **60 FP32 runs**, covering two student architectures, input sizes 160/192/224, two teachers, and seeds 42–46. All 12 combinations contain all five seeds. Analyzed all **17 builds** in `results/hw/u250` (report summaries copied from `build/u250` on the training VM).
 
-- [Accuracy bar chart](fp32_accuracy_overall_95ci.png)
-- [Weighted F1 bar chart](fp32_f1_weighted_95ci.png)
-- [Weighted precision bar chart](fp32_precision_weighted_95ci.png)
-- [FINN estimated FPS chart](u250_estimated_fps.png)
-
-Each chart also has an editable vector `.svg` version with the same filename stem.
+Figures built from these tables are in `analysis/figures/` (`scripts/make_figures.py`).
 
 | File | Contents |
 | --- | --- |
@@ -65,7 +60,7 @@ Examples:
 | Legacy TestResNet 224, 6w6a or 8w8a | 5,000 | 1,957.79 |
 | TestResNet trim160, 6w6a, naive folding | — | 3.39 |
 
-Generated driver output shapes are `(1, 1, 1, 96)` for TestResNet and `(1, 1, 1, 64)` for slim. They are feature vectors. The board-evaluation code applies the classifier tail on the host (`src/run_test_resnet_board_accuracy.py`). Label the future plot's x-axis **FINN estimated accelerator FPS**. Actual end-to-end FPS requires measuring preprocessing, data transfers, accelerator execution and the host tail together.
+Generated driver output shapes are `(1, 1, 1, 96)` for TestResNet and `(1, 1, 1, 64)` for slim. They are feature vectors. The board-evaluation code applies the classifier tail on the host (`src/run_test_resnet_board_accuracy.py`). When post-route timing is met, the FINN figure matches the accelerator throughput measured on the board, so the figures report it as throughput. End-to-end FPS also includes preprocessing, data transfers and the host tail.
 
 The four legacy `test_resnet_*` builds accept 224 × 224 inputs, verified from their drivers. They do not carry the `trim224` identity, so input size alone is insufficient to join them to the new trimmed-input sweep. Weight/activation widths and target settings in this inventory are explicitly taken from folder names; exact source checkpoint/export identity still needs verification.
 
@@ -106,9 +101,9 @@ The matched sweep is now implemented by `scripts/run_qat_kd_teacher_sweep.py`; s
 From the repository root:
 
 ```text
-python scripts/plot_kd_u250_results.py
+python scripts/tabulate_kd_u250.py
 ```
 
-The script requires NumPy, SciPy and Matplotlib, reads reports and drivers without importing training code, and writes only the analysis outputs. `--sweep` can select another folder of FP32 report JSONs; multiple supplied sweeps are summarized and plotted separately. The default is `results/fp32_kd_sweep`. Everything it reads is tracked in git, so it runs on a checkout without the VM.
+The script requires NumPy and SciPy, reads reports and drivers without importing training code, and writes only the analysis outputs. `--sweep` can select another folder of FP32 report JSONs; multiple supplied sweeps are summarized separately. The default is `results/fp32_kd_sweep`. Everything it reads is tracked in git, so it runs on a checkout without the VM.
 
-Validation performed: all 48 summaries independently recomputed from the source JSONs with Python's standard-library statistics; all exported FPS values matched their source fields exactly; full seed coverage, metric ranges, metadata consistency and recall/accuracy identity checked. Source reports and drivers are fingerprinted for reproducibility. All four generated figures were visually inspected. The QAT protocol is a recommendation; training-script changes and new training runs are outside this plotting pass.
+Validation performed: all 48 summaries independently recomputed from the source JSONs with Python's standard-library statistics; all exported FPS values matched their source fields exactly; full seed coverage, metric ranges, metadata consistency and recall/accuracy identity checked. Source reports and drivers are fingerprinted for reproducibility. The QAT protocol is a recommendation; training-script changes and new training runs are outside this plotting pass.
