@@ -33,7 +33,24 @@ FINN, not a measured throughput.
 | `test_resnet_slim128x64_trim160_6w6a_u250_{100,200,500,1000,2000,5000}fps` | `test_resnet_slim128x64_trim160_6w6a.onnx` | |
 | `test_resnet_slim128x64_trim160_8w8a_u250_{2000,5000}fps` | `test_resnet_slim128x64_trim160_8w8a.onnx` | |
 
+Per model, the 5000fps build is the throughput ceiling (no model reached 5000) and the 2000fps
+build is the cheaper speed/area trade-off. The slim 6w6a 100–1000fps builds are kept for a
+single-model area-vs-throughput curve, and `trim160_6w6a_u250_naive` as the unfolded baseline.
+
 A rerun of the slim 6w6a 5000fps build and a `--synth-clk-ns 7.5` attempt were deleted: the first
 was a replica, and in the second Vitis scaled the 133 MHz kernel clock back to 102.6 MHz.
 
 The ONNX files used for these builds are archived on the VM in `models/archive/archived-for-sweep/`.
+
+## Ultra96 builds
+
+All four builds of `test_resnet_slim128x64_trim160_6w6a` meet post-route timing
+(`report/post_route_timing.rpt`). The Zynq PL clock is generated from a PLL, so the requested
+period is rounded: FINN's FPS estimate uses the requested period, the hardware runs at the real one.
+
+| Build folder suffix | Requested | Real clock | WNS | FINN estimate | At real clock |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `ultra96` | 10 ns | 10 ns (100 MHz) | +3.70 ns | 3.39 fps | 3.39 fps |
+| `5fps_ultra96` | 10 ns | 10 ns (100 MHz) | +4.13 ns | 6.78 fps | 6.78 fps |
+| `5fps_ultra96_7.5ns` | 7.5 ns | 8.0 ns (125 MHz) | +1.87 ns | 9.04 fps | 8.48 fps |
+| `5fps_ultra96_5.0ns` | 5.0 ns | 5.333 ns (187.5 MHz) | +0.19 ns | 13.56 fps | 12.72 fps |
