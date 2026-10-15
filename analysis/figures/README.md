@@ -25,9 +25,10 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 
 **`qat_precision_accuracy`** (also `_f1_weighted`)
 > Test accuracy after quantization-aware training at 8 and 6 bits, next to the FP32 starting
-> point. Bars: mean of 10 runs (5 seeds × 2 teachers), value on top; whiskers: 95% t interval.
+> point, for students distilled through the ResNet18 teacher assistant. Bars: mean of 5 seeds, value
+> on top; whiskers: 95% t interval.
 > Each QAT run starts from the FP32 checkpoint with the same seed, split, student and teacher.
-> The y-axis starts at 70%. 4-bit (57.7–60.6%) is shown in `qat_precision_with_4bit_*`.
+> The y-axis starts at 70%. 4-bit (57.3–62.2%) is shown in `qat_precision_with_4bit_*`.
 
 **`qat_precision_with_4bit_accuracy`** (also `_f1_weighted`)
 > As above, including 4-bit QAT; the y-axis starts at 50%.
@@ -38,7 +39,7 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 > at 224 px is limited to 1,958 FPS.
 
 **`u250_accuracy_vs_throughput`**
-> Mean QAT test accuracy (10 runs) against the maximum U250 throughput of each built configuration
+> Mean QAT test accuracy (TA teacher, 5 seeds) against the maximum U250 throughput of each built configuration
 > (`u250_max_throughput`). 6- and 8-bit builds of the same model reach the same throughput: FINN picks
 > the same parallelism for both, and bit-width only changes area.
 
@@ -49,8 +50,13 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 
 ## Notes for the text
 
-- Paired QAT − FP32 change (same seed, split, student and teacher; `data/paired_change_vs_fp32.csv`),
-  60 pairs per bit-width: 8-bit −0.2 pp [−0.9, +0.4], 6-bit −1.3 pp [−2.0, −0.6], 4-bit −23.7 pp [−25.0, −22.5].
+- QAT belongs to the teacher-assistant pipeline, so all QAT figures use the ResNet18-TA runs only.
+  The sweep also ran QAT on the ResNet50-direct students; those runs stay in `results/qat_sweep` and
+  `data/summary.csv` but are not plotted. The TA-vs-direct comparison is the FP32 figure.
+- Paired QAT − FP32 change (TA runs; same seed, split and student; `data/paired_change_vs_fp32.csv`),
+  30 pairs per bit-width: 8-bit −0.7 pp [−1.7, +0.3], 6-bit −1.5 pp [−2.3, −0.6], 4-bit −23.3 pp [−24.7, −21.9].
+- TA minus direct at FP32: Base +2.2 / −1.8 / −2.6 pp and Slim +0.6 / +1.8 / −1.0 pp at 160 / 192 / 224 px.
+  TA tends to help the weaker settings (smallest input, Slim at 192), but every interval overlaps.
 
 - Teacher, input size and architecture differences are within the seed-to-seed spread
   (SD 2–4 pp on 133 test images); the figures do not support ranking them.

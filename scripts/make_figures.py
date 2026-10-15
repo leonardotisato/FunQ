@@ -40,6 +40,8 @@ TEACHER_NAMES = {"r18_ta": "TA (ResNet18)", "r50_direct": "Direct (ResNet50)"}
 PRECISIONS = ("fp32", "8w8a", "6w6a", "4w4a")
 PRECISION_NAMES = {"fp32": "FP32", "8w8a": "8-bit", "6w6a": "6-bit", "4w4a": "4-bit"}
 BIT_MARKERS = {"6w6a": "o", "8w8a": "^"}
+# QAT is part of the teacher-assistant pipeline; the R50-direct QAT runs stay in results/ but are not plotted.
+QAT_TEACHER = "r18_ta"
 
 # Reference categorical palette (light mode, slots 1-3); validated all-pairs for three series.
 RES_COLORS = {160: "#2a78d6", 192: "#eb6834", 224: "#1baf7a"}
@@ -218,7 +220,7 @@ def fig_fp32_teachers(runs, out, metric, label):
 
 
 def fig_qat_precision(runs, out, metric, label, precisions, ylim, name):
-    """Accuracy for each precision, teachers pooled (5 seeds x 2 teachers)."""
+    """Accuracy for each precision; runs are the TA-teacher runs (5 seeds)."""
     stats = summarize(runs, ("architecture", "resolution", "precision"))
     fig, ax = plt.subplots(figsize=(TEXT_WIDTH, 2.1))
     width = 0.13
@@ -267,7 +269,7 @@ def fig_u250_throughput(builds, out):
 
 
 def fig_u250_accuracy_vs_throughput(builds, runs, out):
-    """QAT accuracy (teachers pooled) against the maximum U250 throughput of the same configuration."""
+    """QAT accuracy (TA teacher, 5 seeds) against the maximum U250 throughput of the same configuration."""
     stats = summarize(runs, ("architecture", "resolution", "precision"))
     fig, ax = plt.subplots(figsize=(COLUMN, 2.3))
     rows = []
@@ -323,21 +325,19 @@ def main():
     (out / "data").mkdir(parents=True, exist_ok=True)
     style()
     runs, builds = load_runs(), load_builds()
-    paired = paired_changes(runs)
+    ta_runs = [r for r in runs if r["teacher"] == QAT_TEACHER]
+    paired = paired_changes(ta_runs)
     for metric, label in (("accuracy", "Test accuracy (%)"), ("f1_weighted", "Weighted F1 (%)")):
         fig_fp32_teachers(runs, out, metric, label)
-        fig_qat_precision(runs, out, metric, label, PRECISIONS[:3], (70, 90), "qat_precision")
-        fig_qat_precision(runs, out, metric, label, PRECISIONS, (50, 100), "qat_precision_with_4bit")
+        fig_qat_precision(ta_runs, out, metric, label, PRECISIONS[:3], (70, 90), "qat_precision")
+        fig_qat_precision(ta_runs, out, metric, label, PRECISIONS, (50, 100), "qat_precision_with_4bit")
     fig_u250_throughput(builds, out)
-    acc_fps = fig_u250_accuracy_vs_throughput(builds, runs, out)
+    acc_fps = fig_u250_accuracy_vs_throughput(builds, ta_runs, out)
     area = fig_u250_slim_area(builds, out)
 
-    summary = []
-    for by, scope in ((("architecture", "resolution", "teacher", "precision"), "per_teacher"),
-                      (("architecture", "resolution", "precision"), "teachers_pooled")):
-        for key, metrics in sorted(summarize(runs, by).items()):
-            for metric, s in metrics.items():
-                summary.append({"scope": scope, **dict(zip(by, key)), "metric": metric, **s})
+    by = ("architecture", "resolution", "teacher", "precision")
+    summary = [{**dict(zip(by, key)), "metric": metric, **s}
+               for key, metrics in sorted(summarize(runs, by).items()) for metric, s in metrics.items()]
     write_csv(out / "data/runs.csv", runs)
     write_csv(out / "data/summary.csv", summary)
     write_csv(out / "data/paired_change_vs_fp32.csv", paired)
