@@ -2,7 +2,7 @@
 
 Run from any directory: python scripts/make_figures.py
 Requires numpy, scipy and matplotlib. Reads only results/ (fp32_kd_sweep, qat_sweep, hw/u250);
-writes PDF + PNG figures and the plotted numbers (data/*.csv) to analysis/figures/.
+writes PNG figures (300 dpi) and the plotted numbers (data/*.csv) to analysis/figures/.
 Figures carry no titles or captions; captions live in analysis/figures/README.md.
 
 One encoding is shared by every figure:
@@ -140,14 +140,13 @@ def style():
         "axes.labelcolor": INK, "xtick.color": INK, "ytick.color": INK, "text.color": INK,
         "xtick.major.width": 0.6, "ytick.major.width": 0.6, "xtick.major.size": 2.5, "ytick.major.size": 2.5,
         "axes.spines.top": False, "axes.spines.right": False, "hatch.linewidth": 0.6,
-        "pdf.fonttype": 42, "ps.fonttype": 42, "savefig.dpi": 300, "savefig.bbox": "tight",
+        "savefig.dpi": 300, "savefig.bbox": "tight",
         "savefig.pad_inches": 0.02, "legend.frameon": False, "legend.handlelength": 1.6,
         "legend.columnspacing": 1.2, "legend.handletextpad": 0.5})
 
 
 def save(fig, out, name):
-    for ext in ("pdf", "png"):
-        fig.savefig(out / f"{name}.{ext}")
+    fig.savefig(out / f"{name}.png")
     plt.close(fig)
 
 
