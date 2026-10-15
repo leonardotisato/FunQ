@@ -1,0 +1,153 @@
+{
+  "model": "test_resnet.r160_in1k",
+  "n_params": 373076,
+  "epochs": 143,
+  "best_val_f1": 86.3648,
+  "best_val_loss": 1.6426,
+  "checkpoint": "models/kd_teacher_sweep_20260703_121750/test_resnet_fp32_kd_trim192_r50_direct_seed46_ft.pth",
+  "student_init": "imagenet",
+  "init_checkpoint": null,
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "models/resnet50_fp32_kd.pth",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "experiment_tag": "kd_teacher_sweep_20260703_121750",
+  "random_seed": 46,
+  "student_resolution": 192,
+  "teacher_resolution": 512,
+  "student_preprocess": {
+    "name": "trim_fundus_black_border",
+    "threshold": 8,
+    "pad_ratio": 0.01,
+    "min_pad_px": 4
+  },
+  "input_size": [
+    1,
+    3,
+    192,
+    192
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "use_weighted_loss": false,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 83.72093023255815,
+      "precision_weighted": 83.39793281653746,
+      "recall_weighted": 83.72093023255815,
+      "f1_weighted": 83.33541864998412
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 83.77767441860465,
+        "lower": 77.51937984496125,
+        "upper": 89.92248062015504
+      },
+      "precision_macro": {
+        "mean": 82.94787542266658,
+        "lower": 74.75473362421891,
+        "upper": 90.21395485455189
+      },
+      "recall_macro": {
+        "mean": 79.71782688087588,
+        "lower": 71.34822266896855,
+        "upper": 87.53969207875458
+      },
+      "f1_macro": {
+        "mean": 80.64655780569055,
+        "lower": 72.56693066973165,
+        "upper": 88.08928359208454
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 96.14519379844961,
+          "lower": 92.24806201550388,
+          "upper": 99.2248062015504
+        },
+        "precision": {
+          "mean": 90.05981960670637,
+          "lower": 80.95238095238095,
+          "upper": 97.87234042553192
+        },
+        "recall": {
+          "mean": 100.0,
+          "lower": 100.0,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 94.71631650856284,
+          "lower": 89.47368421052632,
+          "upper": 98.9247311827957
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 90.7432558139535,
+          "lower": 85.27131782945736,
+          "upper": 95.34883720930233
+        },
+        "precision": {
+          "mean": 79.16130618938217,
+          "lower": 61.111111111111114,
+          "upper": 95.0
+        },
+        "recall": {
+          "mean": 73.14811980508632,
+          "lower": 55.00000000000001,
+          "upper": 89.65517241379311
+        },
+        "f1": {
+          "mean": 75.64578335898047,
+          "lower": 60.46511627906976,
+          "upper": 87.80672579453065
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 86.10302325581395,
+          "lower": 79.84496124031007,
+          "upper": 91.47286821705426
+        },
+        "precision": {
+          "mean": 79.13685155230274,
+          "lower": 66.66666666666666,
+          "upper": 90.69767441860465
+        },
+        "recall": {
+          "mean": 79.19903667255403,
+          "lower": 66.66666666666666,
+          "upper": 90.69767441860465
+        },
+        "f1": {
+          "mean": 78.97030621894852,
+          "lower": 68.4931506849315,
+          "upper": 87.50297619047615
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 94.56387596899225,
+          "lower": 90.69767441860465,
+          "upper": 98.44961240310077
+        },
+        "precision": {
+          "mean": 83.43352434227505,
+          "lower": 57.14285714285714,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 66.5241510458631,
+          "lower": 40.0,
+          "upper": 90.0
+        },
+        "f1": {
+          "mean": 73.25382513627034,
+          "lower": 50.0,
+          "upper": 90.32258064516128
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 126,
+  "best_val_f1": 59.9445,
+  "best_val_loss": 3.7229,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim224_4w4a_r50_direct_seed43_qat.pth",
+  "checkpoint_sha256": "3b0e8c71fb4ed5fddf211024ff967d6c49c6d95610c5f6eefd393bb0a235e3bc",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim224_r50_direct_seed43_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 224,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    224,
+    224
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 54.61538461538461,
+      "precision_weighted": 52.25431235431236,
+      "recall_weighted": 54.61538461538461,
+      "f1_weighted": 52.204965224242486
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 54.70484615384614,
+        "lower": 46.15384615384615,
+        "upper": 63.07692307692307
+      },
+      "precision_macro": {
+        "mean": 46.524502787858566,
+        "lower": 37.32746623847167,
+        "upper": 56.339326298701295
+      },
+      "recall_macro": {
+        "mean": 46.90350458290305,
+        "lower": 39.14504224209193,
+        "upper": 55.0904196040096
+      },
+      "f1_macro": {
+        "mean": 45.37398129844738,
+        "lower": 37.199440274602175,
+        "upper": 54.15701115896707
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 76.97584615384616,
+          "lower": 70.0,
+          "upper": 83.84615384615385
+        },
+        "precision": {
+          "mean": 62.577392545005125,
+          "lower": 50.768656716417915,
+          "upper": 74.29131652661056
+        },
+        "recall": {
+          "mean": 87.06552567073702,
+          "lower": 76.59574468085107,
+          "upper": 95.74468085106383
+        },
+        "f1": {
+          "mean": 72.63706293462079,
+          "lower": 62.857142857142854,
+          "upper": 81.42989417989416
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 80.76969230769234,
+          "lower": 73.84615384615385,
+          "upper": 86.92307692307692
+        },
+        "precision": {
+          "mean": 51.91865863882177,
+          "lower": 32.142857142857146,
+          "upper": 71.87812499999995
+        },
+        "recall": {
+          "mean": 50.00007097270672,
+          "lower": 30.434782608695656,
+          "upper": 70.0
+        },
+        "f1": {
+          "mean": 50.45058365882343,
+          "lower": 32.55813953488372,
+          "upper": 66.66666666666666
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 68.51046153846153,
+          "lower": 60.76923076923077,
+          "upper": 76.15384615384615
+        },
+        "precision": {
+          "mean": 53.48948097235192,
+          "lower": 35.483870967741936,
+          "upper": 71.42857142857143
+        },
+        "recall": {
+          "mean": 37.29191887923158,
+          "lower": 23.076923076923077,
+          "upper": 52.27272727272727
+        },
+        "f1": {
+          "mean": 43.603249716136744,
+          "lower": 28.937969924812112,
+          "upper": 57.47126436781609
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 83.15369230769232,
+          "lower": 76.92307692307693,
+          "upper": 89.23076923076924
+        },
+        "precision": {
+          "mean": 18.11247899525543,
+          "lower": 0.0,
+          "upper": 44.44444444444444
+        },
+        "recall": {
+          "mean": 13.25650280893682,
+          "lower": 0.0,
+          "upper": 33.33333333333333
+        },
+        "f1": {
+          "mean": 14.805028884208522,
+          "lower": 0.0,
+          "upper": 35.294117647058826
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "4ae031f878aae04789a7d4be4299e6a34da05c8cb8ad9dc430a973945aea9767",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 43,
+  "split_seed": 43,
+  "qat_seed": 43,
+  "fp32_seed": 43,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim224_r50_direct_seed43/train_test_resnet_slim128x64_trim224_r50_direct_seed43_report.json",
+  "fp32_source_report_sha256": "ceb62f5551d364354e84876b413e99c19438d60b8e45b73cbbe7fe6038832889",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 602,
+      "patients": 548,
+      "rows_sha256": "6b10345824af9824dbb0889032b80ff4ba6a6ab9bfb3c4f8d5afdee7dcd0274b"
+    },
+    "validation": {
+      "images": 132,
+      "patients": 118,
+      "rows_sha256": "5939b2fa990a9625e659f8b8c9f73ed3ee4ae45605eb83c40b4392d6e1074d0c"
+    },
+    "test": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "b364213180c0d58ffd2d2f8302e96708acc5dbee053da8006dd21f5ccd8bec27"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "8671bb96eab02862b56d1da87252b655c194e478809301250e99fe44a3e2b400"
+}

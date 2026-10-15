@@ -1,0 +1,192 @@
+{
+  "weight_bits": 6,
+  "act_bits": 6,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 116,
+  "best_val_f1": 79.7462,
+  "best_val_loss": 1.528,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim192_6w6a_r50_direct_seed42_qat.pth",
+  "checkpoint_sha256": "016e9557a59422188d7303676648a526fc8a5650f405e7a19b8669ab663b30b4",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim192_r50_direct_seed42_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 192,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    192,
+    192
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 83.45864661654136,
+      "precision_weighted": 84.29345941802154,
+      "recall_weighted": 83.45864661654136,
+      "f1_weighted": 83.00583744476496
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 83.52541353383458,
+        "lower": 77.44360902255639,
+        "upper": 89.47368421052632
+      },
+      "precision_macro": {
+        "mean": 86.1958552274652,
+        "lower": 79.08209282037407,
+        "upper": 92.1374267953149
+      },
+      "recall_macro": {
+        "mean": 79.25739135159813,
+        "lower": 71.12227999246525,
+        "upper": 86.92720170454545
+      },
+      "f1_macro": {
+        "mean": 81.27490573714654,
+        "lower": 73.35562122495422,
+        "upper": 88.43224234394448
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 90.99917293233082,
+          "lower": 85.71428571428571,
+          "upper": 95.48872180451127
+        },
+        "precision": {
+          "mean": 79.68573750539596,
+          "lower": 68.75,
+          "upper": 89.47368421052632
+        },
+        "recall": {
+          "mean": 100.0,
+          "lower": 100.0,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 88.59759314188237,
+          "lower": 81.48148148148148,
+          "upper": 94.44444444444444
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 94.01819548872179,
+          "lower": 89.47368421052632,
+          "upper": 97.74436090225564
+        },
+        "precision": {
+          "mean": 90.98721682732698,
+          "lower": 77.27272727272727,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 77.03283391066127,
+          "lower": 60.0,
+          "upper": 92.3076923076923
+        },
+        "f1": {
+          "mean": 83.13380486548621,
+          "lower": 70.0,
+          "upper": 93.33333333333333
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 87.26496240601503,
+          "lower": 81.203007518797,
+          "upper": 92.4812030075188
+        },
+        "precision": {
+          "mean": 83.00924987730944,
+          "lower": 70.90719696969698,
+          "upper": 93.93939393939394
+        },
+        "recall": {
+          "mean": 77.36140610045787,
+          "lower": 64.86486486486487,
+          "upper": 89.28571428571429
+        },
+        "f1": {
+          "mean": 79.89539423846229,
+          "lower": 69.84126984126983,
+          "upper": 88.65979381443299
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 94.76849624060148,
+          "lower": 90.97744360902256,
+          "upper": 98.49624060150376
+        },
+        "precision": {
+          "mean": 91.10121669982848,
+          "lower": 70.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 62.63532539527339,
+          "lower": 37.5,
+          "upper": 85.71428571428571
+        },
+        "f1": {
+          "mean": 73.47283070275529,
+          "lower": 52.17391304347826,
+          "upper": 90.0
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "26581faa56d662e0814d429090c25105d2e4d9a338f4724cfc075aff4dc2379c",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 42,
+  "split_seed": 42,
+  "qat_seed": 42,
+  "fp32_seed": 42,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim192_r50_direct_seed42/train_test_resnet_slim128x64_trim192_r50_direct_seed42_report.json",
+  "fp32_source_report_sha256": "24676e486d5b444b6ad27205c2b4fb33dd4d7f3ed357359e0c3541038353023a",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 601,
+      "patients": 548,
+      "rows_sha256": "74a798faded1dc00496d43d968fa4f86e9391dc38e5ec65522744870eafbeb23"
+    },
+    "validation": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "5e32465050432fddc891e66e64095b97f96014683eb961f43ffe8d3e99f47be6"
+    },
+    "test": {
+      "images": 133,
+      "patients": 118,
+      "rows_sha256": "88eb1671976a783f497591c77d9b1bf15e55bc1373b7ff3ca0c77623fab4920a"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "7b7fcc9bb4006b311839c287de8b4ea1b5b16dd02c0a1cb43cd796545d98e09f"
+}

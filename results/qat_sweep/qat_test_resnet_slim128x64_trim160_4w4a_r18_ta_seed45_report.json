@@ -1,0 +1,192 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 109,
+  "best_val_f1": 66.0703,
+  "best_val_loss": 3.686,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim160_4w4a_r18_ta_seed45_qat.pth",
+  "checkpoint_sha256": "95cebdead39e2ce905a4d875270ad7eb54a3fd76ec09d3519fb33eba0dd24abf",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r18_ta_seed45_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet18_from_resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 54.961832061068705,
+      "precision_weighted": 48.8956279210964,
+      "recall_weighted": 54.961832061068705,
+      "f1_weighted": 50.23645112407762
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 54.98198473282443,
+        "lower": 46.56488549618321,
+        "upper": 63.358778625954194
+      },
+      "precision_macro": {
+        "mean": 41.73551903965869,
+        "lower": 33.935867495818655,
+        "upper": 49.32562820275535
+      },
+      "recall_macro": {
+        "mean": 43.80375801282027,
+        "lower": 37.648107764299674,
+        "upper": 50.09382033566343
+      },
+      "f1_macro": {
+        "mean": 41.073655510374515,
+        "lower": 34.212127258662065,
+        "upper": 47.84233047385621
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 76.33312977099236,
+          "lower": 68.70229007633588,
+          "upper": 83.20610687022901
+        },
+        "precision": {
+          "mean": 60.579509410615415,
+          "lower": 49.23015873015874,
+          "upper": 71.64179104477611
+        },
+        "recall": {
+          "mean": 93.4569346235245,
+          "lower": 85.36585365853658,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 73.34269616488244,
+          "lower": 63.91752577319587,
+          "upper": 81.73913043478261
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 82.48038167938932,
+          "lower": 75.57251908396947,
+          "upper": 88.54961832061069
+        },
+        "precision": {
+          "mean": 58.83708055602202,
+          "lower": 34.778428093645516,
+          "upper": 81.25
+        },
+        "recall": {
+          "mean": 38.53419550937165,
+          "lower": 20.689655172413794,
+          "upper": 57.692307692307686
+        },
+        "f1": {
+          "mean": 45.97986656357255,
+          "lower": 26.666666666666668,
+          "upper": 63.41463414634146
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 64.90633587786259,
+          "lower": 56.48854961832062,
+          "upper": 73.2824427480916
+        },
+        "precision": {
+          "mean": 47.52548619199731,
+          "lower": 31.818181818181817,
+          "upper": 63.1578947368421
+        },
+        "recall": {
+          "mean": 43.22390191838495,
+          "lower": 28.57142857142857,
+          "upper": 58.536585365853654
+        },
+        "f1": {
+          "mean": 44.97205931304309,
+          "lower": 31.32341867469881,
+          "upper": 58.06451612903226
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 86.24412213740457,
+          "lower": 80.1526717557252,
+          "upper": 91.6030534351145
+        },
+        "precision": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "recall": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "f1": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r18_ta",
+  "teacher_arch": "resnet18",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet18_from_resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "1de36de0db54db1596399f2364b469d30d974dd65475846fc9ee48c193ddd283",
+  "student_init_checkpoint_sha256": "522cd0d1444327546a4d9e58177d4dedd1a9634eb13094a663bf6dd84b619eeb",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 45,
+  "split_seed": 45,
+  "qat_seed": 45,
+  "fp32_seed": 45,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim160_r18_ta_seed45/train_test_resnet_slim128x64_trim160_r18_ta_seed45_report.json",
+  "fp32_source_report_sha256": "89c262b7af93df7986bd10fe790a2f6ffb790a90c8e5ed429f7383696034c8c8",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 607,
+      "patients": 548,
+      "rows_sha256": "204d19b89c45bf0a08c829bcfc42d236e25cd99de45d3f125498f4acf7915740"
+    },
+    "validation": {
+      "images": 126,
+      "patients": 118,
+      "rows_sha256": "1e3d265850a065815012e9a8ea948a0ce4751260ff77173c93291a965e950c5c"
+    },
+    "test": {
+      "images": 131,
+      "patients": 118,
+      "rows_sha256": "b0798ee54ef0822cd3cc60c5f1d724b25e0ed1b310d9b667d0514369f58bfdab"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "2956729f4a20faa5ed138e4df7ea49a3d5710f8fd0d1e64b77f74098923c0857"
+}

@@ -1,0 +1,192 @@
+{
+  "weight_bits": 6,
+  "act_bits": 6,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 71,
+  "best_val_f1": 83.3309,
+  "best_val_loss": 1.9214,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim160_6w6a_r50_direct_seed45_qat.pth",
+  "checkpoint_sha256": "dcfca209ff1b4b071e48e192b0ce9e2554d42fc03f9ea7a96bb21474179adbcd",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r50_direct_seed45_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 83.96946564885496,
+      "precision_weighted": 84.20309969928292,
+      "recall_weighted": 83.96946564885496,
+      "f1_weighted": 83.44652182242899
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 83.98137404580153,
+        "lower": 77.86259541984732,
+        "upper": 90.07633587786259
+      },
+      "precision_macro": {
+        "mean": 85.09511160565555,
+        "lower": 77.21045508115529,
+        "upper": 91.57682394270968
+      },
+      "recall_macro": {
+        "mean": 79.13005911077347,
+        "lower": 70.83301158301158,
+        "upper": 87.11776543466225
+      },
+      "f1_macro": {
+        "mean": 80.76019883251647,
+        "lower": 72.34528165333118,
+        "upper": 88.30819824496126
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 93.14656488549618,
+          "lower": 88.54961832061069,
+          "upper": 96.94656488549617
+        },
+        "precision": {
+          "mean": 83.68059288648834,
+          "lower": 73.21428571428571,
+          "upper": 92.72793148880105
+        },
+        "recall": {
+          "mean": 100.0,
+          "lower": 100.0,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 91.03438168409843,
+          "lower": 84.5360824742268,
+          "upper": 96.22676975457512
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 92.3563358778626,
+          "lower": 87.78625954198473,
+          "upper": 96.94656488549617
+        },
+        "precision": {
+          "mean": 83.21052208713257,
+          "lower": 66.66666666666666,
+          "upper": 96.29629629629629
+        },
+        "recall": {
+          "mean": 76.9506042482732,
+          "lower": 60.0,
+          "upper": 92.5925925925926
+        },
+        "f1": {
+          "mean": 79.62034344759637,
+          "lower": 66.66666666666666,
+          "upper": 90.9090909090909
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 87.8050381679389,
+          "lower": 81.67938931297711,
+          "upper": 93.12977099236642
+        },
+        "precision": {
+          "mean": 83.36311006344668,
+          "lower": 71.42857142857143,
+          "upper": 93.93939393939394
+        },
+        "recall": {
+          "mean": 79.56006634708001,
+          "lower": 66.66666666666666,
+          "upper": 90.9090909090909
+        },
+        "f1": {
+          "mean": 81.23720257083737,
+          "lower": 71.42857142857143,
+          "upper": 89.58333333333334
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 94.65480916030535,
+          "lower": 90.83969465648855,
+          "upper": 98.47328244274809
+        },
+        "precision": {
+          "mean": 90.12622138555459,
+          "lower": 66.66666666666666,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 60.00956584774075,
+          "lower": 33.33333333333333,
+          "upper": 85.71428571428571
+        },
+        "f1": {
+          "mean": 71.14886762753369,
+          "lower": 47.05882352941176,
+          "upper": 89.65517241379311
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "4339c727d5d6b9fa31540e2c5b29b0be3f8377e9fb6a3b00d1ec7b41d3ec7e42",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 45,
+  "split_seed": 45,
+  "qat_seed": 45,
+  "fp32_seed": 45,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim160_r50_direct_seed45/train_test_resnet_slim128x64_trim160_r50_direct_seed45_report.json",
+  "fp32_source_report_sha256": "a86a0e4e98ee1e4b8e133f1a56fb3581b40bacc18e0559f33b298935612754ad",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 607,
+      "patients": 548,
+      "rows_sha256": "204d19b89c45bf0a08c829bcfc42d236e25cd99de45d3f125498f4acf7915740"
+    },
+    "validation": {
+      "images": 126,
+      "patients": 118,
+      "rows_sha256": "1e3d265850a065815012e9a8ea948a0ce4751260ff77173c93291a965e950c5c"
+    },
+    "test": {
+      "images": 131,
+      "patients": 118,
+      "rows_sha256": "b0798ee54ef0822cd3cc60c5f1d724b25e0ed1b310d9b667d0514369f58bfdab"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "f9e6876a1d2633d4733d3e54abeb15f5e44569ecb3518bc9627cd3758baa5493"
+}

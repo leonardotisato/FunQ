@@ -1,0 +1,192 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 65,
+  "best_val_f1": 64.3877,
+  "best_val_loss": 3.7422,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim224_4w4a_r50_direct_seed45_qat.pth",
+  "checkpoint_sha256": "7aab9ee4fc18dc86436067414b537255d2395e14b4d889b4cd1d27f274bd2439",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim224_r50_direct_seed45_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 224,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    224,
+    224
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 57.25190839694657,
+      "precision_weighted": 55.34061395329235,
+      "recall_weighted": 57.25190839694656,
+      "f1_weighted": 52.966524569578
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 57.274198473282446,
+        "lower": 48.854961832061065,
+        "upper": 65.64885496183206
+      },
+      "precision_macro": {
+        "mean": 53.2957756047521,
+        "lower": 39.39157857910606,
+        "upper": 67.66058377896613
+      },
+      "recall_macro": {
+        "mean": 46.83867324899496,
+        "lower": 39.59974859509021,
+        "upper": 54.81658981050971
+      },
+      "f1_macro": {
+        "mean": 45.533141110271465,
+        "lower": 36.394133594122266,
+        "upper": 55.29398854289179
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 77.86358778625953,
+          "lower": 70.22900763358778,
+          "upper": 84.7328244274809
+        },
+        "precision": {
+          "mean": 62.327815725534705,
+          "lower": 50.70422535211267,
+          "upper": 73.52941176470588
+        },
+        "recall": {
+          "mean": 93.53453047605456,
+          "lower": 85.71428571428571,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 74.64416970480941,
+          "lower": 65.04065040650406,
+          "upper": 82.99383904505197
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 80.9453435114504,
+          "lower": 74.04580152671755,
+          "upper": 87.02290076335878
+        },
+        "precision": {
+          "mean": 55.54981859836929,
+          "lower": 20.0,
+          "upper": 88.88888888888889
+        },
+        "recall": {
+          "mean": 19.23688027938483,
+          "lower": 5.0,
+          "upper": 36.0
+        },
+        "f1": {
+          "mean": 27.978604402572472,
+          "lower": 8.0,
+          "upper": 47.82608695652174
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 67.96312977099235,
+          "lower": 60.30534351145038,
+          "upper": 75.57251908396947
+        },
+        "precision": {
+          "mean": 52.21088543765181,
+          "lower": 37.5,
+          "upper": 66.66666666666666
+        },
+        "recall": {
+          "mean": 54.51714879786294,
+          "lower": 39.473684210526315,
+          "upper": 69.04761904761905
+        },
+        "f1": {
+          "mean": 53.05754768874756,
+          "lower": 39.56043956043956,
+          "upper": 65.1685393258427
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 87.77633587786259,
+          "lower": 81.67938931297711,
+          "upper": 93.12977099236642
+        },
+        "precision": {
+          "mean": 43.09458265745263,
+          "lower": 0.0,
+          "upper": 83.33333333333334
+        },
+        "recall": {
+          "mean": 20.066133442677497,
+          "lower": 0.0,
+          "upper": 42.857142857142854
+        },
+        "f1": {
+          "mean": 26.452242644956435,
+          "lower": 0.0,
+          "upper": 51.85185185185185
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "9e8094c924e2f04b215040daf65990732f9de79cba654be0271324567503d506",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 45,
+  "split_seed": 45,
+  "qat_seed": 45,
+  "fp32_seed": 45,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim224_r50_direct_seed45/train_test_resnet_slim128x64_trim224_r50_direct_seed45_report.json",
+  "fp32_source_report_sha256": "f941e070a75c586218cb5189956119bba5042a9765afae96ad51ab7d901054fc",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 607,
+      "patients": 548,
+      "rows_sha256": "204d19b89c45bf0a08c829bcfc42d236e25cd99de45d3f125498f4acf7915740"
+    },
+    "validation": {
+      "images": 126,
+      "patients": 118,
+      "rows_sha256": "1e3d265850a065815012e9a8ea948a0ce4751260ff77173c93291a965e950c5c"
+    },
+    "test": {
+      "images": 131,
+      "patients": 118,
+      "rows_sha256": "b0798ee54ef0822cd3cc60c5f1d724b25e0ed1b310d9b667d0514369f58bfdab"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "a5e9a2695dc574724ceb2322c99e8f9d4dc972eb6386ebd55d18c4d88af3d880"
+}

@@ -1,0 +1,195 @@
+{
+  "weight_bits": 6,
+  "act_bits": 6,
+  "n_params": 373092,
+  "epochs": 145,
+  "best_val_f1": 83.6899,
+  "best_val_loss": 1.8699,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_trim224_6w6a_r50_direct_seed44_qat.pth",
+  "checkpoint_sha256": "d19637502fa345c3eefce0bbfbf5d1489ab2dcda202cb7366fe9329b9133eac1",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_fp32_kd_trim224_r50_direct_seed44_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 224,
+  "teacher_resolution": 512,
+  "student_preprocess": {
+    "name": "trim_fundus_black_border",
+    "threshold": 8,
+    "pad_ratio": 0.01,
+    "min_pad_px": 4
+  },
+  "input_size": [
+    1,
+    3,
+    224,
+    224
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 83.07692307692308,
+      "precision_weighted": 83.32377767160375,
+      "recall_weighted": 83.07692307692308,
+      "f1_weighted": 82.94083407234314
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 83.09015384615388,
+        "lower": 76.15384615384615,
+        "upper": 89.23076923076924
+      },
+      "precision_macro": {
+        "mean": 81.45677710476893,
+        "lower": 73.35889411685727,
+        "upper": 89.01632878555364
+      },
+      "recall_macro": {
+        "mean": 78.81481648205828,
+        "lower": 70.50771172241951,
+        "upper": 86.78981022041684
+      },
+      "f1_macro": {
+        "mean": 79.49626037063437,
+        "lower": 71.33649094909886,
+        "upper": 87.11992355711872
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 96.92784615384615,
+          "lower": 93.84615384615384,
+          "upper": 99.23076923076923
+        },
+        "precision": {
+          "mean": 93.46825564336257,
+          "lower": 85.41666666666666,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 97.7434332655176,
+          "lower": 92.3076923076923,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 95.50945650420591,
+          "lower": 90.625,
+          "upper": 99.02912621359224
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 93.08130769230772,
+          "lower": 88.46153846153845,
+          "upper": 96.92307692307692
+        },
+        "precision": {
+          "mean": 90.54192081476337,
+          "lower": 76.19047619047619,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 73.09209800946743,
+          "lower": 55.00000000000001,
+          "upper": 89.65517241379311
+        },
+        "f1": {
+          "mean": 80.5364660530145,
+          "lower": 66.66666666666666,
+          "upper": 92.0
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 84.62407692307694,
+          "lower": 78.46153846153847,
+          "upper": 90.76923076923077
+        },
+        "precision": {
+          "mean": 75.00553569002243,
+          "lower": 62.22222222222222,
+          "upper": 86.66666666666667
+        },
+        "recall": {
+          "mean": 81.87438545108475,
+          "lower": 69.6969696969697,
+          "upper": 92.5
+        },
+        "f1": {
+          "mean": 78.10422698087149,
+          "lower": 68.1306990881459,
+          "upper": 86.66814159292034
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 91.54707692307693,
+          "lower": 86.15384615384616,
+          "upper": 96.15384615384616
+        },
+        "precision": {
+          "mean": 66.81139627092739,
+          "lower": 41.17647058823529,
+          "upper": 90.9090909090909
+        },
+        "recall": {
+          "mean": 62.54934920216326,
+          "lower": 37.5,
+          "upper": 86.66666666666667
+        },
+        "f1": {
+          "mean": 63.83489194444565,
+          "lower": 41.66666666666667,
+          "upper": 82.35294117647058
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "240228a91c4cbdaa97c8bd3c23649938a6c90512ab790d6577e8dfba94cee2ca",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 44,
+  "split_seed": 44,
+  "qat_seed": 44,
+  "fp32_seed": 44,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_trim224_r50_direct_seed44/train_test_resnet_trim224_r50_direct_seed44_report.json",
+  "fp32_source_report_sha256": "3147aca89ecff882cdfa59a1e2f7b18613db98e810c13b25554949a392ad014f",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 604,
+      "patients": 548,
+      "rows_sha256": "c1b0e61829033cd2dc477c790bf490882d4d5ab3ec70a332fbe7c82afbc6ea7d"
+    },
+    "validation": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "472ecaf8e3282d322124ce73ac89081f1a0b24bc88a3d9da8e125c8f93099b55"
+    },
+    "test": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "5a00cbe6c4b9e98f75a01fb875471d2b8a923bdce93175c48ac72ce6698c07dd"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "71a7ba60b0161c576a7c75e32b2797fd8cb90f6d20877644f0148528855c81c5"
+}

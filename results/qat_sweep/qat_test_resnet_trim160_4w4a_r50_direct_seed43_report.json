@@ -1,0 +1,195 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "n_params": 373092,
+  "epochs": 177,
+  "best_val_f1": 61.2102,
+  "best_val_loss": 3.7711,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_trim160_4w4a_r50_direct_seed43_qat.pth",
+  "checkpoint_sha256": "65d81d58ca5b5293323bf8dfd5da6c3ffe4426b40b5d77bde5df63c5ae4b3d84",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_fp32_kd_trim160_r50_direct_seed43_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "student_preprocess": {
+    "name": "trim_fundus_black_border",
+    "threshold": 8,
+    "pad_ratio": 0.01,
+    "min_pad_px": 4
+  },
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 56.92307692307692,
+      "precision_weighted": 51.647066866184076,
+      "recall_weighted": 56.92307692307692,
+      "f1_weighted": 53.24377124377124
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 57.0076923076923,
+        "lower": 48.46153846153846,
+        "upper": 65.38461538461539
+      },
+      "precision_macro": {
+        "mean": 43.68915453170721,
+        "lower": 36.215271965693425,
+        "upper": 51.041844040247675
+      },
+      "recall_macro": {
+        "mean": 45.68581535580588,
+        "lower": 39.248227279306306,
+        "upper": 52.113113204464014
+      },
+      "f1_macro": {
+        "mean": 43.56161526595459,
+        "lower": 36.7825099036184,
+        "upper": 50.28151292298122
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 77.76176923076925,
+          "lower": 70.76923076923077,
+          "upper": 84.61538461538461
+        },
+        "precision": {
+          "mean": 63.16732736238683,
+          "lower": 51.5625,
+          "upper": 74.66666666666667
+        },
+        "recall": {
+          "mean": 89.22969612919857,
+          "lower": 79.48717948717949,
+          "upper": 97.61904761904762
+        },
+        "f1": {
+          "mean": 73.79739864378949,
+          "lower": 64.28571428571429,
+          "upper": 82.45614035087719
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 82.30253846153848,
+          "lower": 75.38461538461539,
+          "upper": 88.46153846153845
+        },
+        "precision": {
+          "mean": 57.85254671969643,
+          "lower": 33.33333333333333,
+          "upper": 80.0
+        },
+        "recall": {
+          "mean": 42.335225441615904,
+          "lower": 23.076923076923077,
+          "upper": 61.53846153846154
+        },
+        "f1": {
+          "mean": 48.32426011116026,
+          "lower": 28.57142857142857,
+          "upper": 65.21739130434783
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 69.2566923076923,
+          "lower": 60.76923076923077,
+          "upper": 76.92307692307693
+        },
+        "precision": {
+          "mean": 53.736744044745585,
+          "lower": 38.095238095238095,
+          "upper": 68.75
+        },
+        "recall": {
+          "mean": 51.178339852409074,
+          "lower": 36.108333333333356,
+          "upper": 65.9090909090909
+        },
+        "f1": {
+          "mean": 52.12480230886863,
+          "lower": 38.46153846153847,
+          "upper": 64.44623655913976
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 84.69438461538462,
+          "lower": 78.46153846153847,
+          "upper": 90.76923076923077
+        },
+        "precision": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "recall": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "f1": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "3383e31a182743d7a5f6d76efd1f8a2e6e204eeb7cfdb08c259c2b7d4b6db901",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 43,
+  "split_seed": 43,
+  "qat_seed": 43,
+  "fp32_seed": 43,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_trim160_r50_direct_seed43/train_test_resnet_trim160_r50_direct_seed43_report.json",
+  "fp32_source_report_sha256": "5fbab8074eea41d0be6a04c1a8f845ef5bcbdfac48cc2fd8d02397afff8f01c3",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 602,
+      "patients": 548,
+      "rows_sha256": "6b10345824af9824dbb0889032b80ff4ba6a6ab9bfb3c4f8d5afdee7dcd0274b"
+    },
+    "validation": {
+      "images": 132,
+      "patients": 118,
+      "rows_sha256": "5939b2fa990a9625e659f8b8c9f73ed3ee4ae45605eb83c40b4392d6e1074d0c"
+    },
+    "test": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "b364213180c0d58ffd2d2f8302e96708acc5dbee053da8006dd21f5ccd8bec27"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "ecf27e1d4c62f08c3ae937d91fec82c32220ecbb7de8d17f973462feb29ac7dc"
+}

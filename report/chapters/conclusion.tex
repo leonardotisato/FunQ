@@ -1,0 +1,30 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This work combines teacher-assistant distillation, low-bit quantization-aware
+training, and FINN dataflow compilation to obtain a deployable Ultra96
+accelerator for the four-class ultra-widefield fundus task. The intermediate
+ResNet-18 assistant was needed to avoid the capacity-gap loss observed when the
+large teacher was distilled directly into the tiny student. Six-bit QAT preserved
+the student's accuracy while reducing the arithmetic precision enough for FPGA
+deployment.
+
+The hardware exploration was ultimately limited by on-chip memory rather than
+compute. Moving selected FIFOs from block RAM to LUTRAM made the full 6-bit
+\texttt{test\_resnet} fit, but it left almost no block-RAM headroom for extra
+folding. The reduced-width variant narrowed the late channel widths, freed memory,
+and enabled one additional folding point. The resulting operating points span
+clock scaling and folding: at the same 187.5\,MHz clock, throughput rose from
+6.36 images/s for the full model to 12.71 images/s for the reduced-width model,
+with board accuracy decreasing only from 81.20 to 80.45. The final
+reduced-width accelerator is bit-exact with its software reference and reaches
+79.89 weighted F1 and 75.62 macro F1.
+
+The remaining limitations are the ones exposed by the design space itself.
+Four-bit quantization collapses accuracy for this small network, 8-bit hardware
+does not fit the Ultra96 resource budget, and the final deployment remains
+memory-bound. The main clinical weakness is still recall on the minority lesion
+classes, especially melanoma and CHRPE. Future work should therefore improve
+FIFO sizing and folding selection in the FINN flow, explore architectures with
+better minority-class recall at the same memory cost, and evaluate larger FPGA
+devices able to host higher-resolution variants.

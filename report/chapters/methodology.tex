@@ -1,0 +1,149 @@
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Dataset and Preprocessing}
+\label{sec:method-data}
+
+We use the same four-class dataset as Tasso et al.~\cite{tasso2026lesion}: 864
+ultra-widefield fundus images labelled healthy, choroidal nevus, uveal melanoma,
+or CHRPE, with 302, 290, 170, and 102 images per class. Uveal melanoma and CHRPE
+are the least represented, and CHRPE, the smallest class, is also the hardest to
+classify, as it overlaps visually with nevus. The test set holds 133 images, with
+47 healthy, 44 nevus, 26 melanoma, and 16 CHRPE.
+
+Their pipeline resizes each image to $512\times512$ and normalizes it with
+ImageNet statistics, and the teacher and assistant networks
+(Section~\ref{sec:method-kd}) keep this unchanged. The deployed student instead
+runs at $160\times160$, the native resolution of its backbone, reached by trimming
+the dark border around the circular field of view and resizing; the normalization
+is the same.
+
+\begin{figure*}[t]
+\centering
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+    font=\footnotesize,
+    stage/.style={
+        draw=black!75,
+        rounded corners=2pt,
+        align=center,
+        minimum width=2.55cm,
+        minimum height=0.78cm,
+        inner xsep=5pt,
+        inner ysep=4pt
+    },
+    flow/.style={-{Latex[length=2.2mm,width=1.5mm]}, line width=0.35pt},
+    qattrain/.style={flow, rounded corners=5pt},
+    init/.style={flow, dashed},
+    edge note/.style={font=\scriptsize, inner sep=0pt}
+]
+\node[stage] (crop) {ResNet-50\\lesion crops};
+\node[stage, right=0.65cm of crop] (field) {ResNet-50\\full field};
+\node[stage, right=0.65cm of field] (assistant) {ResNet-18\\assistant};
+\node[stage, right=0.65cm of assistant] (student) {\texttt{test\_resnet}\\FP32 student};
+\node[stage, right=0.65cm of student] (quantized) {quantized\\\texttt{test\_resnet}};
+
+\draw[flow] (crop) -- node[midway, above=4pt, edge note] {KD} (field);
+\draw[flow] (field) -- node[midway, above=4pt, edge note] {KD} (assistant);
+\draw[flow] (assistant) -- node[midway, above=4pt, edge note] {KD} (student);
+\draw[init] (student) -- node[midway, above=4pt, edge note] {init.} (quantized);
+\draw[qattrain] (assistant.south) -- ++(0,-0.85)
+    -- node[midway, above=4pt, edge note] {KD}
+    ($(quantized.south)+(0,-0.85)$) -- (quantized.south);
+\end{tikzpicture}%
+}
+\caption{The teacher-assistant distillation chain.}
+\label{fig:takd}
+\end{figure*}
+
+\subsection{Teacher-Assistant Knowledge Distillation}
+\label{sec:method-kd}
+
+The deployed network must be small enough to fit the FPGA, which constrains the
+architecture before accuracy is considered. On a dataset this small, training from
+scratch forces a bad trade: a large network overfits, and a small one learns too
+little. ImageNet-pretrained initialization avoids it by giving a small network
+visual features it could not acquire from the data alone. For the deployable
+student we need this initialization in a backbone much smaller than the ResNet
+teachers. We therefore instantiate the student with timm using the pretrained
+\texttt{test\_resnet.r160\_in1k} checkpoint hosted on Hugging Face
+\cite{hfTestResnet}: a ResNet-style model with native $160\times160$ resolution
+and ImageNet-1k weights. Fine-tuning it on the four-class task
+improves on the small from-scratch baselines but plateaus short of the accuracy
+we require, which is what motivates distillation.
+
+Following Tasso et al., we first train a ResNet-50 \cite{he2016resnet} on
+lesion-centered crops and use it to teach a ResNet-50 operating on the full
+fundus field. This full-field ResNet-50 is the large teacher used for the
+remaining chain. Distilling it directly into \texttt{test\_resnet} did not reach
+the accuracy we expected, which is unsurprising when teacher and student are this
+far apart in capacity: the student cannot match the much larger teacher's output
+distribution \cite{cho2019efficacy}. The established remedy is to bridge the gap
+with an intermediate network \cite{mirzadeh2020takd}, so we distil the full-field
+ResNet-50 into a ResNet-18 and make that the teacher of \texttt{test\_resnet}.
+Figure~\ref{fig:takd} shows the resulting teacher-assistant chain.
+
+Every stage minimizes the same objective, a convex combination of the
+cross-entropy on the labels and a Kullback-Leibler term that aligns the student's
+softened output with the teacher's,
+\begin{equation}
+\mathcal{L} = \alpha\,\mathcal{L}_{\mathrm{CE}}(y, p_s)
+            + (1-\alpha)\,\mathcal{L}_{\mathrm{KL}}(p_t^{\tau}, p_s^{\tau}),
+\end{equation}
+with $p_t^{\tau}$ and $p_s^{\tau}$ the teacher and student outputs softened at
+temperature $\tau$, and $\alpha$ the weight on the two terms. We keep
+$\alpha = 0.25$ and $\tau = 3$ throughout, including the quantization-aware
+training of Section~\ref{sec:method-qat}, where distillation stays active.
+
+\subsection{Quantization-Aware Training}
+\label{sec:method-qat}
+
+For deployment the fine-tuned student is reimplemented in Brevitas
+\cite{pappalardo2023brevitas}, its convolutions, activations, and final linear
+layer replaced by quantized counterparts that constrain weights and activations to
+a fixed bit-width. We initialize this quantized model from the FP32 student and
+run a calibration pass to set the quantizer scales. Loading the weights transfers
+the trained floating-point solution into the Brevitas model; calibration then
+defines how activations, and the already-loaded weights, are mapped to the
+available fixed-point grid. We then continue training with quantizers active. The
+distillation objective and the same teacher remain in use, so the network adapts
+its weights to the precision it will use at inference instead of relying only on
+the calibrated quantized warm start.
+
+We train one model per precision, quantizing weights and activations to the same
+width at 8, 6, and 4 bits. Lower precision yields a smaller accelerator but
+degrades accuracy, a trade-off we examine in Section~\ref{sec:res-qat}.
+
+\subsection{Hardware Compilation and Deployment}
+\label{sec:method-hw}
+
+The trained quantized model is exported from Brevitas to QONNX and handed to FINN,
+which compiles it into the streaming dataflow accelerator described in
+Section~\ref{sec:bg-fpga}: every layer becomes its own hardware block, lowered
+through high-level synthesis into a bitstream. The target is the Ultra96, a Zynq
+UltraScale+ device, where the programmable logic holds the accelerator and the
+processing system streams images to it and reads back predictions.
+
+FINN exposes many build parameters; those that drive the memory and throughput
+trade-off we faced are the folding of the compute blocks and their adjacent stream
+adapters, controlled mainly through PE and SIMD factors; the depth of each
+inter-layer FIFO; the memory style of each block, that is whether its storage
+maps to block RAM or to distributed LUT memory, configurable per block and
+otherwise left to a default heuristic; and the target clock period. We tune these
+in the design-space exploration of Section~\ref{sec:res-dse};
+Section~\ref{sec:res-hw} reports the deployed configurations.
+
+Block RAM is worth a closer look, since it turns out to be the resource that bounds
+our design. The FPGA fabric used here exposes it as 36-Kb primitives, each usable
+as two independent 18-Kb halves and accessed through one write and one read port.
+The hardware blocks generated by FINN need storage for weights, thresholds, and
+inter-layer streams. Through memory-style attributes, FINN can steer that storage
+toward block RAM or distributed LUT memory, depending on the block and backend. In
+the design space exploration we exploit this configurability
+specifically on FIFOs, where it is a direct way to relieve BRAM pressure without
+changing arithmetic. This matters
+especially for shallow FIFOs, which can reserve a block-RAM primitive or half
+primitive while storing only a small fraction of its capacity. FINN leaves the
+FIFO memory style to a default heuristic that sends FIFOs below a depth threshold
+to LUT memory and the rest to block RAM, and that assignment is the lever we act
+on in Section~\ref{sec:res-dse}.

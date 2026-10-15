@@ -1,0 +1,192 @@
+{
+  "weight_bits": 8,
+  "act_bits": 8,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 84,
+  "best_val_f1": 84.0361,
+  "best_val_loss": 1.7967,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim224_8w8a_r50_direct_seed46_qat.pth",
+  "checkpoint_sha256": "87a6029db120f48b9883ca34e3d6701a99c88f6c66b735fc9608cc7788315f1a",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim224_r50_direct_seed46_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 224,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    224,
+    224
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 83.72093023255815,
+      "precision_weighted": 84.1499370569138,
+      "recall_weighted": 83.72093023255815,
+      "f1_weighted": 83.21578462337337
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 83.7720930232558,
+        "lower": 77.51937984496125,
+        "upper": 89.92248062015504
+      },
+      "precision_macro": {
+        "mean": 84.6567399196433,
+        "lower": 76.65399157278398,
+        "upper": 91.30963444088589
+      },
+      "recall_macro": {
+        "mean": 79.66586717921182,
+        "lower": 71.24629020363157,
+        "upper": 87.33173820370868
+      },
+      "f1_macro": {
+        "mean": 80.96794142051074,
+        "lower": 72.67426184344382,
+        "upper": 88.21249995406404
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 96.15302325581393,
+          "lower": 92.24806201550388,
+          "upper": 99.2248062015504
+        },
+        "precision": {
+          "mean": 90.07767320584345,
+          "lower": 80.85106382978722,
+          "upper": 97.87234042553192
+        },
+        "recall": {
+          "mean": 100.0,
+          "lower": 100.0,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 94.72573980706335,
+          "lower": 89.41176470588236,
+          "upper": 98.9247311827957
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 90.71612403100775,
+          "lower": 85.27131782945736,
+          "upper": 95.34883720930233
+        },
+        "precision": {
+          "mean": 88.85901350088928,
+          "lower": 72.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 61.43916049231384,
+          "lower": 41.935483870967744,
+          "upper": 80.64516129032258
+        },
+        "f1": {
+          "mean": 72.16078507444136,
+          "lower": 55.172413793103445,
+          "upper": 85.71428571428571
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 85.32124031007751,
+          "lower": 79.06976744186046,
+          "upper": 90.69767441860465
+        },
+        "precision": {
+          "mean": 75.06255090518353,
+          "lower": 62.264150943396224,
+          "upper": 86.66666666666667
+        },
+        "recall": {
+          "mean": 83.83261807287671,
+          "lower": 72.09302325581395,
+          "upper": 94.23214285714283
+        },
+        "f1": {
+          "mean": 79.02031393564477,
+          "lower": 69.1335978835979,
+          "upper": 87.5
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 95.3537984496124,
+          "lower": 91.47286821705426,
+          "upper": 98.44961240310077
+        },
+        "precision": {
+          "mean": 84.62772206665697,
+          "lower": 61.53846153846154,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 73.3916901516567,
+          "lower": 50.0,
+          "upper": 93.75
+        },
+        "f1": {
+          "mean": 77.96492686489349,
+          "lower": 57.14285714285714,
+          "upper": 93.33333333333333
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "afb3e08a492f5acd2d6d52daf93ec5bd86b68053553e545b6a49cce5aeddaede",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 46,
+  "split_seed": 46,
+  "qat_seed": 46,
+  "fp32_seed": 46,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim224_r50_direct_seed46/train_test_resnet_slim128x64_trim224_r50_direct_seed46_report.json",
+  "fp32_source_report_sha256": "f3eb59990e96947c8a9e6fb977d69f8c8e57865959e04e78f9e4bbc07cd1c06d",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 601,
+      "patients": 548,
+      "rows_sha256": "df154690e2e618cdf418b3f4761031d783fdfa62dee0702e74ec8a4c50db80ff"
+    },
+    "validation": {
+      "images": 134,
+      "patients": 118,
+      "rows_sha256": "6f8d596caeba4ce4d122bd9f0b1c331a283664d08b0c2d2016592f0e4443eed7"
+    },
+    "test": {
+      "images": 129,
+      "patients": 118,
+      "rows_sha256": "a4f0444e6274feec191b2f75c3da9c9e5096612e3149ffc11b3c22c258d974a0"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "303929efd73b8c84c7f966bf2c34545df3077e3d3765145dbfa981b5f156c620"
+}

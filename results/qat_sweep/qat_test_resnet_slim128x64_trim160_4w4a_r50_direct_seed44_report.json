@@ -1,0 +1,192 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 72,
+  "best_val_f1": 59.795,
+  "best_val_loss": 3.934,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim160_4w4a_r50_direct_seed44_qat.pth",
+  "checkpoint_sha256": "e17f6dd7a8b39c1098f9d181cfa551f2bb10b28dd00529aeda880d05431fca8e",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r50_direct_seed44_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 64.61538461538461,
+      "precision_weighted": 67.9957181088314,
+      "recall_weighted": 64.61538461538461,
+      "f1_weighted": 61.35395491148435
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 64.56330769230767,
+        "lower": 56.15384615384615,
+        "upper": 72.3269230769228
+      },
+      "precision_macro": {
+        "mean": 67.49011743916309,
+        "lower": 42.666561102831594,
+        "upper": 77.82541869751621
+      },
+      "recall_macro": {
+        "mean": 53.21540651501093,
+        "lower": 46.2228284825438,
+        "upper": 60.80161991798308
+      },
+      "f1_macro": {
+        "mean": 52.404959958116294,
+        "lower": 43.50532157248628,
+        "upper": 62.2667999162692
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 92.29907692307694,
+          "lower": 87.6923076923077,
+          "upper": 96.15384615384616
+        },
+        "precision": {
+          "mean": 83.97075698376854,
+          "lower": 73.33333333333333,
+          "upper": 93.61702127659575
+        },
+        "recall": {
+          "mean": 95.43364914984375,
+          "lower": 88.37209302325581,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 89.23116742015563,
+          "lower": 82.05128205128204,
+          "upper": 95.14563106796116
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 79.21838461538462,
+          "lower": 72.3076923076923,
+          "upper": 86.15384615384616
+        },
+        "precision": {
+          "mean": 47.38907392472945,
+          "lower": 25.0,
+          "upper": 70.58823529411765
+        },
+        "recall": {
+          "mean": 34.62418434556596,
+          "lower": 16.666666666666664,
+          "upper": 53.84615384615385
+        },
+        "f1": {
+          "mean": 39.474828109143594,
+          "lower": 20.51282051282051,
+          "upper": 57.14285714285714
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 68.41215384615383,
+          "lower": 60.0,
+          "upper": 76.15384615384615
+        },
+        "precision": {
+          "mean": 52.50063884815434,
+          "lower": 39.682539682539684,
+          "upper": 65.3061224489796
+        },
+        "recall": {
+          "mean": 70.44876032643546,
+          "lower": 56.52173913043478,
+          "upper": 83.33333333333334
+        },
+        "f1": {
+          "mean": 59.93654573836265,
+          "lower": 48.19277108433735,
+          "upper": 70.6896551724138
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 89.19700000000003,
+          "lower": 83.84615384615385,
+          "upper": 93.84615384615384
+        },
+        "precision": {
+          "mean": 86.1,
+          "lower": 0.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 12.355032238198568,
+          "lower": 0.0,
+          "upper": 31.57894736842105
+        },
+        "f1": {
+          "mean": 20.977298564803323,
+          "lower": 0.0,
+          "upper": 48.0
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "0b2f3b2fb7baac32af041a378bde8ec8e679e002f90e00a14fafdfb678c13333",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 44,
+  "split_seed": 44,
+  "qat_seed": 44,
+  "fp32_seed": 44,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim160_r50_direct_seed44/train_test_resnet_slim128x64_trim160_r50_direct_seed44_report.json",
+  "fp32_source_report_sha256": "47beb9587cf6a556ea796484772fc7121576a73a6da3095eaf86b0e4fef4097c",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 604,
+      "patients": 548,
+      "rows_sha256": "c1b0e61829033cd2dc477c790bf490882d4d5ab3ec70a332fbe7c82afbc6ea7d"
+    },
+    "validation": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "472ecaf8e3282d322124ce73ac89081f1a0b24bc88a3d9da8e125c8f93099b55"
+    },
+    "test": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "5a00cbe6c4b9e98f75a01fb875471d2b8a923bdce93175c48ac72ce6698c07dd"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "3e17ae6a9aa723a8238796e083928bd9653b4390fe459d72c43659360028d490"
+}

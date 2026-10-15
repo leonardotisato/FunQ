@@ -90,5 +90,5 @@ fi
 echo
 echo "Sweep complete."
 echo "Models:  models/${EXPERIMENT_TAG}"
-echo "Results: results_vgg16/${EXPERIMENT_TAG}"
+echo "Results: runs/${EXPERIMENT_TAG}"
 echo "Logs:    ${LOG_ROOT}"

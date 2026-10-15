@@ -8,11 +8,11 @@ csv_file: fundus_data_final.csv
 # Directory 
 hydra:
   run:
-    dir: outputs/${now:%Y%m%d_%H%M%S}  
+    dir: logs/hydra/${now:%Y%m%d_%H%M%S}  
   job:
     chdir: false  
 
-results_dir: results_vgg16
+results_dir: runs
 models_dir: models
 logs_dir: logs
 

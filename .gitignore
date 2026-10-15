@@ -1,7 +1,7 @@
 # results and logs
 models/
 logs/
-results*/
+runs/
 venv/
 
 # model checkpoints

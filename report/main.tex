@@ -1,0 +1,67 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Knowledge Distillation and Quantization-Aware Training for Fundus Image Classification on Embedded FPGAs}
+
+\author{\IEEEauthorblockN{Leonardo Tisato}
+\IEEEauthorblockA{\textit{Dipartimento di Elettronica, Informazione e Bioingegneria} \\
+\textit{Politecnico di Milano}\\
+Milano, Italy \\
+leonardo.tisato@mail.polimi.it}
+}
+
+\maketitle
+
+\begin{abstract}
+Deploying neural classifiers for fundus images on embedded FPGAs requires
+compressing both the network and its arithmetic while preserving the diagnostic
+performance that makes the classifier useful. This work studies that tradeoff for
+a four-class ultra-widefield fundus task, where the target device is an
+Ultra96-v2 and the classifier must distinguish healthy eyes, choroidal nevus,
+uveal melanoma, and congenital hypertrophy of the retinal pigment epithelium. We
+start from a large ResNet-50 teacher and compress it into a much smaller student by
+means of teacher-assistant knowledge distillation, then train low-precision
+versions of the student with quantization-aware training in Brevitas and compile
+the resulting networks with FINN. The hardware exploration shows that the binding
+constraint is on-chip memory rather than arithmetic logic: bit-width, FIFO memory
+style, and late-stage channel width determine whether the design fits and how
+much layer-level parallelism can be afforded. The exploration produces two
+deployable 6-bit accelerator families and several hardware operating points.
+Preserving the student's original channel widths gives the highest deployed
+accuracy, 81.20\%, but saturates block RAM and reaches 6.36 images/s at the
+routed 187.5\,MHz clock. Reducing the late channel widths lowers accuracy only
+slightly, to 80.45\%, while freeing enough memory for an additional folding step.
+The best reduced-width operating point reaches 79.89 weighted F1, 75.62 macro F1,
+and 12.71 images/s at 187.5\,MHz on the 133-image test set.
+\end{abstract}
+
+\begin{IEEEkeywords}
+knowledge distillation, quantization-aware training, FPGA, FINN, Brevitas, embedded inference, fundus image classification
+\end{IEEEkeywords}
+
+\input{chapters/introduction}
+\input{chapters/background}
+\input{chapters/methodology}
+\input{chapters/results}
+\input{chapters/conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

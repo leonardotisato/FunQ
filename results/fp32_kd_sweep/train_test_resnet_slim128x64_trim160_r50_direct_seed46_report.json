@@ -1,0 +1,249 @@
+{
+  "model": "TestResNetSlim",
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217876,
+  "epochs": 34,
+  "best_val_f1": 81.5831,
+  "best_val_loss": 1.7913,
+  "checkpoint": "models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r50_direct_seed46_ft.pth",
+  "student_init": "matching_trim_fp32_checkpoint",
+  "init_checkpoint": "models/kd_teacher_sweep_20260703_121750/test_resnet_fp32_kd_trim160_r50_direct_seed46_ft.pth",
+  "weight_transfer": {
+    "exact": [
+      "conv1.0.weight",
+      "conv1.1.weight",
+      "conv1.1.bias",
+      "conv1.1.running_mean",
+      "conv1.1.running_var",
+      "conv1.1.num_batches_tracked",
+      "conv1.3.weight",
+      "conv1.4.weight",
+      "conv1.4.bias",
+      "conv1.4.running_mean",
+      "conv1.4.running_var",
+      "conv1.4.num_batches_tracked",
+      "conv1.6.weight",
+      "bn1.weight",
+      "bn1.bias",
+      "bn1.running_mean",
+      "bn1.running_var",
+      "bn1.num_batches_tracked",
+      "layer1.0.conv1.weight",
+      "layer1.0.bn1.weight",
+      "layer1.0.bn1.bias",
+      "layer1.0.bn1.running_mean",
+      "layer1.0.bn1.running_var",
+      "layer1.0.bn1.num_batches_tracked",
+      "layer1.0.conv2.weight",
+      "layer1.0.bn2.weight",
+      "layer1.0.bn2.bias",
+      "layer1.0.bn2.running_mean",
+      "layer1.0.bn2.running_var",
+      "layer1.0.bn2.num_batches_tracked",
+      "layer2.0.conv1.weight",
+      "layer2.0.bn1.weight",
+      "layer2.0.bn1.bias",
+      "layer2.0.bn1.running_mean",
+      "layer2.0.bn1.running_var",
+      "layer2.0.bn1.num_batches_tracked",
+      "layer2.0.conv2.weight",
+      "layer2.0.bn2.weight",
+      "layer2.0.bn2.bias",
+      "layer2.0.bn2.running_mean",
+      "layer2.0.bn2.running_var",
+      "layer2.0.bn2.num_batches_tracked",
+      "layer2.0.downsample.1.weight",
+      "layer2.0.downsample.2.weight",
+      "layer2.0.downsample.2.bias",
+      "layer2.0.downsample.2.running_mean",
+      "layer2.0.downsample.2.running_var",
+      "layer2.0.downsample.2.num_batches_tracked",
+      "layer3.0.conv1.weight",
+      "layer3.0.bn1.weight",
+      "layer3.0.bn1.bias",
+      "layer3.0.bn1.running_mean",
+      "layer3.0.bn1.running_var",
+      "layer3.0.bn1.num_batches_tracked",
+      "layer3.0.conv2.weight",
+      "layer3.0.bn2.weight",
+      "layer3.0.bn2.bias",
+      "layer3.0.bn2.running_mean",
+      "layer3.0.bn2.running_var",
+      "layer3.0.bn2.num_batches_tracked",
+      "layer3.0.bn3.num_batches_tracked",
+      "layer3.0.downsample.2.num_batches_tracked",
+      "layer4.0.bn1.num_batches_tracked",
+      "layer4.0.bn2.num_batches_tracked",
+      "layer4.0.downsample.2.num_batches_tracked",
+      "fc.bias"
+    ],
+    "sliced": [
+      "layer3.0.conv3.weight",
+      "layer3.0.bn3.weight",
+      "layer3.0.bn3.bias",
+      "layer3.0.bn3.running_mean",
+      "layer3.0.bn3.running_var",
+      "layer3.0.downsample.1.weight",
+      "layer3.0.downsample.2.weight",
+      "layer3.0.downsample.2.bias",
+      "layer3.0.downsample.2.running_mean",
+      "layer3.0.downsample.2.running_var",
+      "layer4.0.conv1.weight",
+      "layer4.0.bn1.weight",
+      "layer4.0.bn1.bias",
+      "layer4.0.bn1.running_mean",
+      "layer4.0.bn1.running_var",
+      "layer4.0.conv2.weight",
+      "layer4.0.bn2.weight",
+      "layer4.0.bn2.bias",
+      "layer4.0.bn2.running_mean",
+      "layer4.0.bn2.running_var",
+      "layer4.0.downsample.1.weight",
+      "layer4.0.downsample.2.weight",
+      "layer4.0.downsample.2.bias",
+      "layer4.0.downsample.2.running_mean",
+      "layer4.0.downsample.2.running_var",
+      "fc.weight"
+    ],
+    "missing": [],
+    "skipped": []
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "models/resnet50_fp32_kd.pth",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "experiment_tag": "kd_teacher_sweep_20260703_121750",
+  "random_seed": 46,
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 77.51937984496124,
+      "precision_weighted": 77.11667195551325,
+      "recall_weighted": 77.51937984496125,
+      "f1_weighted": 76.65038403471439
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 77.50100775193796,
+        "lower": 70.54263565891473,
+        "upper": 84.49612403100775
+      },
+      "precision_macro": {
+        "mean": 76.82306193295466,
+        "lower": 67.31756022040582,
+        "upper": 85.32471975205965
+      },
+      "recall_macro": {
+        "mean": 72.84646636513308,
+        "lower": 64.13199032150645,
+        "upper": 81.54570919276802
+      },
+      "f1_macro": {
+        "mean": 73.46674837356147,
+        "lower": 64.48366277315937,
+        "upper": 81.98025334153026
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 93.03527131782946,
+          "lower": 88.37209302325581,
+          "upper": 96.89922480620154
+        },
+        "precision": {
+          "mean": 83.37383708662577,
+          "lower": 72.91666666666666,
+          "upper": 92.85714285714286
+        },
+        "recall": {
+          "mean": 100.0,
+          "lower": 100.0,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 90.84771862791207,
+          "lower": 84.33734939759037,
+          "upper": 96.29629629629629
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 88.35689922480618,
+          "lower": 82.17054263565892,
+          "upper": 93.7984496124031
+        },
+        "precision": {
+          "mean": 70.16864852838067,
+          "lower": 51.85185185185185,
+          "upper": 86.95652173913044
+        },
+        "recall": {
+          "mean": 73.0524211009151,
+          "lower": 55.00000000000001,
+          "upper": 89.47368421052632
+        },
+        "f1": {
+          "mean": 71.17936901899814,
+          "lower": 55.55555555555556,
+          "upper": 84.06178489702512
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 80.60589147286818,
+          "lower": 73.64341085271317,
+          "upper": 87.59689922480621
+        },
+        "precision": {
+          "mean": 73.68435501542584,
+          "lower": 58.97435897435898,
+          "upper": 87.17948717948718
+        },
+        "recall": {
+          "mean": 65.06619711244194,
+          "lower": 50.0,
+          "upper": 79.41176470588235
+        },
+        "f1": {
+          "mean": 68.83658805277166,
+          "lower": 56.25,
+          "upper": 80.0
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 93.0039534883721,
+          "lower": 88.37209302325581,
+          "upper": 96.89922480620154
+        },
+        "precision": {
+          "mean": 80.06540710138637,
+          "lower": 50.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 53.267247247175284,
+          "lower": 27.27272727272727,
+          "upper": 78.57142857142857
+        },
+        "f1": {
+          "mean": 63.003317794564026,
+          "lower": 37.5,
+          "upper": 83.33333333333334
+        }
+      }
+    }
+  }
+}

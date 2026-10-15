@@ -1,0 +1,195 @@
+{
+  "weight_bits": 6,
+  "act_bits": 6,
+  "n_params": 373092,
+  "epochs": 19,
+  "best_val_f1": 83.4752,
+  "best_val_loss": 1.9441,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_trim192_6w6a_r50_direct_seed46_qat.pth",
+  "checkpoint_sha256": "5d7dd5f4e544a5515d0dd7a74fbf6d415d49b348465e8fcbd9316b48fab898bb",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_fp32_kd_trim192_r50_direct_seed46_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 192,
+  "teacher_resolution": 512,
+  "student_preprocess": {
+    "name": "trim_fundus_black_border",
+    "threshold": 8,
+    "pad_ratio": 0.01,
+    "min_pad_px": 4
+  },
+  "input_size": [
+    1,
+    3,
+    192,
+    192
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 82.17054263565892,
+      "precision_weighted": 82.22931941882958,
+      "recall_weighted": 82.17054263565892,
+      "f1_weighted": 81.63720023573144
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 82.22069767441859,
+        "lower": 75.1937984496124,
+        "upper": 88.37209302325581
+      },
+      "precision_macro": {
+        "mean": 82.26602332939062,
+        "lower": 73.19540333252432,
+        "upper": 89.89178138360607
+      },
+      "recall_macro": {
+        "mean": 76.41296455905304,
+        "lower": 67.57555293025165,
+        "upper": 84.73625405779363
+      },
+      "f1_macro": {
+        "mean": 78.01497398324321,
+        "lower": 68.8431641528808,
+        "upper": 86.02968640133231
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 94.6174418604651,
+          "lower": 90.69767441860465,
+          "upper": 98.44961240310077
+        },
+        "precision": {
+          "mean": 88.07864446334374,
+          "lower": 78.26086956521739,
+          "upper": 96.15384615384616
+        },
+        "recall": {
+          "mean": 97.83431922651438,
+          "lower": 92.6829268292683,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 92.62619085293194,
+          "lower": 86.48648648648648,
+          "upper": 97.67441860465115
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 92.26217054263564,
+          "lower": 87.59689922480621,
+          "upper": 96.12403100775194
+        },
+        "precision": {
+          "mean": 86.28877092747267,
+          "lower": 70.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 73.01158251848788,
+          "lower": 54.54545454545454,
+          "upper": 89.47368421052632
+        },
+        "f1": {
+          "mean": 78.73600961888145,
+          "lower": 64.0,
+          "upper": 90.32258064516128
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 84.52883720930231,
+          "lower": 78.29457364341084,
+          "upper": 90.69767441860465
+        },
+        "precision": {
+          "mean": 74.49807846811215,
+          "lower": 61.36363636363637,
+          "upper": 86.66666666666667
+        },
+        "recall": {
+          "mean": 81.50125990412519,
+          "lower": 69.04761904761905,
+          "upper": 92.5
+        },
+        "f1": {
+          "mean": 77.64715739324947,
+          "lower": 67.44186046511628,
+          "upper": 86.42027620841179
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 93.03294573643413,
+          "lower": 88.37209302325581,
+          "upper": 96.89922480620154
+        },
+        "precision": {
+          "mean": 80.19859945863391,
+          "lower": 50.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 53.30469658708471,
+          "lower": 26.666666666666668,
+          "upper": 80.0
+        },
+        "f1": {
+          "mean": 63.05053806791001,
+          "lower": 36.36363636363637,
+          "upper": 83.87096774193549
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "0dc09f7a54a89412e7aae77c422676352e3b58c4e4f9688920c18643cce05091",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 46,
+  "split_seed": 46,
+  "qat_seed": 46,
+  "fp32_seed": 46,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_trim192_r50_direct_seed46/train_test_resnet_trim192_r50_direct_seed46_report.json",
+  "fp32_source_report_sha256": "7bd62ea226ab1b2c58a302e12e4a424b52d51bf88224651c2e87244ad10ebace",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 601,
+      "patients": 548,
+      "rows_sha256": "df154690e2e618cdf418b3f4761031d783fdfa62dee0702e74ec8a4c50db80ff"
+    },
+    "validation": {
+      "images": 134,
+      "patients": 118,
+      "rows_sha256": "6f8d596caeba4ce4d122bd9f0b1c331a283664d08b0c2d2016592f0e4443eed7"
+    },
+    "test": {
+      "images": 129,
+      "patients": 118,
+      "rows_sha256": "a4f0444e6274feec191b2f75c3da9c9e5096612e3149ffc11b3c22c258d974a0"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "92fd1f05d3ba5632c5b7d0145f6c13f64ed7c439690988dbdb65ac64dfcb3974"
+}

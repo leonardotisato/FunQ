@@ -1,0 +1,46 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Early differentiation of uveal melanocytic lesions is clinically decisive: uveal
+melanoma is malignant and time-sensitive, yet on fundus imaging it is hard to
+separate from benign nevus or congenital hypertrophy of the retinal pigment
+epithelium (CHRPE), and expert reading is subject to high inter-observer
+variability \cite{chadwick2025ai}. Deep learning provides reproducible decision support, and recent
+work attains strong four-class accuracy on ultra-widefield fundus images
+\cite{tasso2026lesion}. These systems, however, are built on large convolutional
+backbones and assume workstation- or cloud-class compute, which sits awkwardly
+with the point-of-care setting in which screening is most valuable.
+
+Bringing such a classifier onto an embedded FPGA would place inference at the
+bedside, at low power and latency and without transferring sensitive images
+off-device. The obstacle is one of scale. Accurate models in this domain rely on
+ResNet-class networks whose weight and activation memory exceeds the on-chip
+budget of a small device, where block RAM is the binding resource. Compression and low-bit quantization are therefore
+mandatory, yet accuracy cannot be traded away freely: a missed melanoma carries a
+direct clinical cost, so a deployment is useful only if it preserves diagnostic
+quality. The problem is thus to locate the operating point, in model size and
+arithmetic precision, that fits the device while keeping accuracy clinically
+acceptable, a balance that the strong class imbalance of the data makes harder
+still.
+
+We address this tradeoff with three contributions:
+\begin{itemize}
+\item a teacher-assistant knowledge-distillation chain of decreasing capacity that
+  compresses the network, where an intermediate assistant suppresses the
+  degradation incurred when a large teacher is distilled directly into a small
+  student \cite{hinton2015distilling, cho2019efficacy, mirzadeh2020takd};
+\item a Brevitas-based study of quantization-aware training across multiple
+  weight and activation bit-widths \cite{pappalardo2023brevitas};
+\item an end-to-end deployment through the FINN dataflow toolchain
+  \cite{umuroglu2017finn, blott2018finnr} in a resource-driven design-space
+  exploration over arithmetic precision and layer width, the axes that raise
+  accuracy as they grow and free on-chip memory as they shrink.
+\end{itemize}
+
+On the Ultra96, the design-space exploration produces two deployable 6-bit
+accelerator families rather than a single winner. One operating point preserves
+more model capacity and favors accuracy, but remains memory-bound; the other
+trades a small accuracy margin for enough on-chip memory headroom to add
+parallelism and improve throughput. Both deployed accelerators remain bit-exact
+with their software references; the fastest point reaches 12.71 images/s at
+187.5\,MHz on the 133-image test set.

@@ -1,0 +1,195 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "n_params": 373092,
+  "epochs": 80,
+  "best_val_f1": 61.776,
+  "best_val_loss": 3.2191,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_trim160_4w4a_r50_direct_seed42_qat.pth",
+  "checkpoint_sha256": "09ca10b93992d31744475f7185888e4bab34e45db394de3b86a160c358cbe6f3",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_fp32_kd_trim160_r50_direct_seed42_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "student_preprocess": {
+    "name": "trim_fundus_black_border",
+    "threshold": 8,
+    "pad_ratio": 0.01,
+    "min_pad_px": 4
+  },
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 57.89473684210526,
+      "precision_weighted": 54.70945262448016,
+      "recall_weighted": 57.89473684210527,
+      "f1_weighted": 55.453305416807
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 57.889849624060155,
+        "lower": 49.62406015037594,
+        "upper": 66.16541353383458
+      },
+      "precision_macro": {
+        "mean": 49.353460725499914,
+        "lower": 39.05188659728579,
+        "upper": 60.65805730937013
+      },
+      "recall_macro": {
+        "mean": 48.59188721228979,
+        "lower": 41.048388256268694,
+        "upper": 56.52176147369848
+      },
+      "f1_macro": {
+        "mean": 47.58652283592882,
+        "lower": 39.10656483416477,
+        "upper": 56.49089667696045
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 79.70195488721805,
+          "lower": 72.93233082706767,
+          "upper": 86.46616541353383
+        },
+        "precision": {
+          "mean": 66.11584254385477,
+          "lower": 53.96825396825397,
+          "upper": 77.61194029850746
+        },
+        "recall": {
+          "mean": 87.21145179629093,
+          "lower": 77.08333333333334,
+          "upper": 95.83333333333334
+        },
+        "f1": {
+          "mean": 75.038191252193,
+          "lower": 65.3061224489796,
+          "upper": 83.58270124785905
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 80.45218045112782,
+          "lower": 73.68421052631578,
+          "upper": 87.21804511278195
+        },
+        "precision": {
+          "mean": 50.05881152910765,
+          "lower": 28.57142857142857,
+          "upper": 71.42857142857143
+        },
+        "recall": {
+          "mean": 42.24565913785486,
+          "lower": 23.076923076923077,
+          "upper": 61.904761904761905
+        },
+        "f1": {
+          "mean": 45.29790070835891,
+          "lower": 26.666666666666668,
+          "upper": 62.22222222222222
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 70.64541353383458,
+          "lower": 62.40601503759399,
+          "upper": 78.19548872180451
+        },
+        "precision": {
+          "mean": 56.061399788270684,
+          "lower": 40.54054054054054,
+          "upper": 71.05263157894737
+        },
+        "recall": {
+          "mean": 52.32444248015794,
+          "lower": 37.5,
+          "upper": 67.44186046511628
+        },
+        "f1": {
+          "mean": 53.83491775791573,
+          "lower": 40.0,
+          "upper": 65.97938144329896
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 84.98015037593984,
+          "lower": 78.19548872180451,
+          "upper": 90.97744360902256
+        },
+        "precision": {
+          "mean": 25.17778904076659,
+          "lower": 0.0,
+          "upper": 60.0
+        },
+        "recall": {
+          "mean": 12.585995434855457,
+          "lower": 0.0,
+          "upper": 31.25
+        },
+        "f1": {
+          "mean": 16.175081625247618,
+          "lower": 0.0,
+          "upper": 37.03703703703704
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "a99d3f911477c45e0929b06611ffd0c63e9cccb0987a5a9009a6dea7dbd482f9",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 42,
+  "split_seed": 42,
+  "qat_seed": 42,
+  "fp32_seed": 42,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_trim160_r50_direct_seed42/train_test_resnet_trim160_r50_direct_seed42_report.json",
+  "fp32_source_report_sha256": "a3871eb29ef34b24b1f385e7f747ab71b64967145253eb1f1763fac53e610d5c",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 601,
+      "patients": 548,
+      "rows_sha256": "74a798faded1dc00496d43d968fa4f86e9391dc38e5ec65522744870eafbeb23"
+    },
+    "validation": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "5e32465050432fddc891e66e64095b97f96014683eb961f43ffe8d3e99f47be6"
+    },
+    "test": {
+      "images": 133,
+      "patients": 118,
+      "rows_sha256": "88eb1671976a783f497591c77d9b1bf15e55bc1373b7ff3ca0c77623fab4920a"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "f1d5a4ddfe490e6e872d6a1c1e8b467907f50f98ffb751764aa6bde083d70c81"
+}

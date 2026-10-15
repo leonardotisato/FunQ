@@ -1,0 +1,192 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 57,
+  "best_val_f1": 50.902,
+  "best_val_loss": 4.5101,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim160_4w4a_r18_ta_seed46_qat.pth",
+  "checkpoint_sha256": "d5279724d56ddd04e72f4eb7c918716683ca97358686af10f32318312c1f7f6b",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r18_ta_seed46_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet18_from_resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 59.689922480620154,
+      "precision_weighted": 51.5219200280296,
+      "recall_weighted": 59.68992248062015,
+      "f1_weighted": 55.05885081124479
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 59.69201550387597,
+        "lower": 51.162790697674424,
+        "upper": 68.21705426356588
+      },
+      "precision_macro": {
+        "mean": 41.98424660115543,
+        "lower": 35.28886563328913,
+        "upper": 48.60224997935552
+      },
+      "recall_macro": {
+        "mean": 48.178876530391335,
+        "lower": 41.74839461600115,
+        "upper": 54.50003417219039
+      },
+      "f1_macro": {
+        "mean": 44.458571505646944,
+        "lower": 37.94892428207767,
+        "upper": 50.74801122922447
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 86.07937984496122,
+          "lower": 79.84496124031007,
+          "upper": 91.47286821705426
+        },
+        "precision": {
+          "mean": 72.94806092743478,
+          "lower": 61.016949152542374,
+          "upper": 83.92857142857143
+        },
+        "recall": {
+          "mean": 95.62643936731907,
+          "lower": 88.88888888888889,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 82.62121770795893,
+          "lower": 74.07407407407408,
+          "upper": 89.90825688073394
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 76.75100775193798,
+          "lower": 68.9922480620155,
+          "upper": 83.72093023255815
+        },
+        "precision": {
+          "mean": 42.63173549758817,
+          "lower": 24.0,
+          "upper": 61.53846153846154
+        },
+        "recall": {
+          "mean": 45.96112674984344,
+          "lower": 26.08695652173913,
+          "upper": 65.38461538461539
+        },
+        "f1": {
+          "mean": 43.769613059340756,
+          "lower": 26.082930756843837,
+          "upper": 60.0
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 68.19829457364341,
+          "lower": 59.68992248062015,
+          "upper": 75.96899224806202
+        },
+        "precision": {
+          "mean": 52.35718997959881,
+          "lower": 37.49387254901966,
+          "upper": 67.5
+        },
+        "recall": {
+          "mean": 51.12794000440283,
+          "lower": 36.11111111111111,
+          "upper": 65.95744680851064
+        },
+        "f1": {
+          "mean": 51.443455255288086,
+          "lower": 37.9746835443038,
+          "upper": 64.0
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 88.35534883720929,
+          "lower": 82.17054263565892,
+          "upper": 93.7984496124031
+        },
+        "precision": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "recall": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        },
+        "f1": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r18_ta",
+  "teacher_arch": "resnet18",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet18_from_resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "1de36de0db54db1596399f2364b469d30d974dd65475846fc9ee48c193ddd283",
+  "student_init_checkpoint_sha256": "83b3dbbdde8126ac1a6aa12a8a3b4862eea682e12f4f4c64540e7a990e2df19a",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 46,
+  "split_seed": 46,
+  "qat_seed": 46,
+  "fp32_seed": 46,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim160_r18_ta_seed46/train_test_resnet_slim128x64_trim160_r18_ta_seed46_report.json",
+  "fp32_source_report_sha256": "31f64633813850db58a5ba065d333c1b5d62f30ef2c55ceed0d8e02dd2359c1f",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 601,
+      "patients": 548,
+      "rows_sha256": "df154690e2e618cdf418b3f4761031d783fdfa62dee0702e74ec8a4c50db80ff"
+    },
+    "validation": {
+      "images": 134,
+      "patients": 118,
+      "rows_sha256": "6f8d596caeba4ce4d122bd9f0b1c331a283664d08b0c2d2016592f0e4443eed7"
+    },
+    "test": {
+      "images": 129,
+      "patients": 118,
+      "rows_sha256": "a4f0444e6274feec191b2f75c3da9c9e5096612e3149ffc11b3c22c258d974a0"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "f79541fd5b2dff1cbba4bbd806f02c6095a99744c40d17ce8464575c28655141"
+}

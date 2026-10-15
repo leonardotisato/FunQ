@@ -1,0 +1,192 @@
+{
+  "weight_bits": 6,
+  "act_bits": 6,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 89,
+  "best_val_f1": 84.1709,
+  "best_val_loss": 1.6989,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim192_6w6a_r18_ta_seed43_qat.pth",
+  "checkpoint_sha256": "de1cfd7cb83ebf9fd5c70e11f3b7136d4d36f445e76760b339d44b80844882dc",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim192_r18_ta_seed43_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet18_from_resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 192,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    192,
+    192
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 75.38461538461539,
+      "precision_weighted": 74.55465587044536,
+      "recall_weighted": 75.38461538461539,
+      "f1_weighted": 74.65101352457674
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 75.44207692307693,
+        "lower": 67.6923076923077,
+        "upper": 82.3076923076923
+      },
+      "precision_macro": {
+        "mean": 71.32307897676652,
+        "lower": 62.24556859089127,
+        "upper": 80.3590314666004
+      },
+      "recall_macro": {
+        "mean": 70.50411798280874,
+        "lower": 61.867939735702905,
+        "upper": 79.00459723106576
+      },
+      "f1_macro": {
+        "mean": 70.2554525244217,
+        "lower": 61.618426410166606,
+        "upper": 78.72214995078383
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 92.3056153846154,
+          "lower": 87.6923076923077,
+          "upper": 96.15384615384616
+        },
+        "precision": {
+          "mean": 83.33893981183968,
+          "lower": 72.91578389830508,
+          "upper": 92.45283018867924
+        },
+        "recall": {
+          "mean": 97.83755937385594,
+          "lower": 92.6829268292683,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 89.9184956816578,
+          "lower": 83.14606741573034,
+          "upper": 95.34883720930233
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 92.31753846153849,
+          "lower": 87.6923076923077,
+          "upper": 96.92307692307692
+        },
+        "precision": {
+          "mean": 83.35358656298222,
+          "lower": 66.66666666666666,
+          "upper": 96.29629629629629
+        },
+        "recall": {
+          "mean": 76.94548947023434,
+          "lower": 59.25925925925925,
+          "upper": 92.3076923076923
+        },
+        "f1": {
+          "mean": 79.68376415492871,
+          "lower": 66.66666666666666,
+          "upper": 90.9090909090909
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 77.75292307692308,
+          "lower": 70.76923076923077,
+          "upper": 84.61538461538461
+        },
+        "precision": {
+          "mean": 68.56729337454632,
+          "lower": 53.125,
+          "upper": 82.92682926829268
+        },
+        "recall": {
+          "mean": 60.52927852829137,
+          "lower": 45.65217391304348,
+          "upper": 75.0
+        },
+        "f1": {
+          "mean": 64.0081858213242,
+          "lower": 50.74626865671642,
+          "upper": 75.60975609756098
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 88.50807692307696,
+          "lower": 83.07692307692308,
+          "upper": 93.84615384615384
+        },
+        "precision": {
+          "mean": 50.032496157697814,
+          "lower": 22.22222222222222,
+          "upper": 77.77777777777779
+        },
+        "recall": {
+          "mean": 46.70414455885331,
+          "lower": 20.0,
+          "upper": 72.72727272727273
+        },
+        "f1": {
+          "mean": 47.41136443977613,
+          "lower": 22.22222222222222,
+          "upper": 68.96551724137932
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r18_ta",
+  "teacher_arch": "resnet18",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet18_from_resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "1de36de0db54db1596399f2364b469d30d974dd65475846fc9ee48c193ddd283",
+  "student_init_checkpoint_sha256": "8d0d18bd3a2f419a12432c96a2e440b92976a23af9b5f28c365606a124e737c3",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 43,
+  "split_seed": 43,
+  "qat_seed": 43,
+  "fp32_seed": 43,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim192_r18_ta_seed43/train_test_resnet_slim128x64_trim192_r18_ta_seed43_report.json",
+  "fp32_source_report_sha256": "02f31103f59edd4eee7cd5fc0e9d1384c99099d49688f0f247c8baf077373d9c",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 602,
+      "patients": 548,
+      "rows_sha256": "6b10345824af9824dbb0889032b80ff4ba6a6ab9bfb3c4f8d5afdee7dcd0274b"
+    },
+    "validation": {
+      "images": 132,
+      "patients": 118,
+      "rows_sha256": "5939b2fa990a9625e659f8b8c9f73ed3ee4ae45605eb83c40b4392d6e1074d0c"
+    },
+    "test": {
+      "images": 130,
+      "patients": 118,
+      "rows_sha256": "b364213180c0d58ffd2d2f8302e96708acc5dbee053da8006dd21f5ccd8bec27"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "8648aa3d43bf40f2399b9249f52cff6605646896eb6ef71a69551f17bb9b23a2"
+}

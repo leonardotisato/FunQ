@@ -1,0 +1,195 @@
+{
+  "weight_bits": 6,
+  "act_bits": 6,
+  "n_params": 373092,
+  "epochs": 48,
+  "best_val_f1": 83.2173,
+  "best_val_loss": 2.0273,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_trim160_6w6a_r50_direct_seed45_qat.pth",
+  "checkpoint_sha256": "a20e9d7303b73984e0ed93226eb506b991c1a3d305b0fa5a0163dd6ee603026a",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_fp32_kd_trim160_r50_direct_seed45_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "student_preprocess": {
+    "name": "trim_fundus_black_border",
+    "threshold": 8,
+    "pad_ratio": 0.01,
+    "min_pad_px": 4
+  },
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 80.1526717557252,
+      "precision_weighted": 82.09856702825766,
+      "recall_weighted": 80.1526717557252,
+      "f1_weighted": 78.19735546529556
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 80.13778625954198,
+        "lower": 73.2824427480916,
+        "upper": 86.25954198473282
+      },
+      "precision_macro": {
+        "mean": 84.0910638961112,
+        "lower": 77.47794296177261,
+        "upper": 89.80207326354628
+      },
+      "recall_macro": {
+        "mean": 72.00071946806538,
+        "lower": 64.69254877552925,
+        "upper": 79.41929485068073
+      },
+      "f1_macro": {
+        "mean": 72.06644488704835,
+        "lower": 62.44730667455938,
+        "upper": 81.25559896817462
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 90.07557251908398,
+          "lower": 84.7328244274809,
+          "upper": 94.65648854961832
+        },
+        "precision": {
+          "mean": 78.95219114328246,
+          "lower": 67.79661016949152,
+          "upper": 89.0909090909091
+        },
+        "recall": {
+          "mean": 97.84039154425258,
+          "lower": 92.6829268292683,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 87.28005282989821,
+          "lower": 79.66101694915254,
+          "upper": 93.45794392523365
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 92.35549618320611,
+          "lower": 87.78625954198473,
+          "upper": 96.18320610687023
+        },
+        "precision": {
+          "mean": 76.56404386080278,
+          "lower": 60.0,
+          "upper": 90.9090909090909
+        },
+        "recall": {
+          "mean": 88.47674120157768,
+          "lower": 75.0,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 81.8212427302233,
+          "lower": 69.38775510204081,
+          "upper": 91.52542372881356
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 86.24793893129771,
+          "lower": 80.1526717557252,
+          "upper": 91.6030534351145
+        },
+        "precision": {
+          "mean": 82.52802058035958,
+          "lower": 70.58823529411765,
+          "upper": 93.93939393939394
+        },
+        "recall": {
+          "mean": 74.93978853782606,
+          "lower": 61.76470588235294,
+          "upper": 87.2340425531915
+        },
+        "f1": {
+          "mean": 78.34357334217381,
+          "lower": 68.18056943056943,
+          "upper": 87.35632183908046
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 91.59656488549619,
+          "lower": 86.25954198473282,
+          "upper": 96.18320610687023
+        },
+        "precision": {
+          "mean": 98.32,
+          "lower": 100.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 26.745956588605225,
+          "lower": 6.25,
+          "upper": 50.0
+        },
+        "f1": {
+          "mean": 40.82091064589803,
+          "lower": 11.76470588235294,
+          "upper": 66.66666666666666
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "87c297c04103710ad0f04ccb46dc51a14cf7f692e85fd61127f2984cbf139d6f",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 45,
+  "split_seed": 45,
+  "qat_seed": 45,
+  "fp32_seed": 45,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_trim160_r50_direct_seed45/train_test_resnet_trim160_r50_direct_seed45_report.json",
+  "fp32_source_report_sha256": "148f564e22bc6ff809ca4ec1046acf0b678ea3748b76898e181fe8e188e2342c",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 607,
+      "patients": 548,
+      "rows_sha256": "204d19b89c45bf0a08c829bcfc42d236e25cd99de45d3f125498f4acf7915740"
+    },
+    "validation": {
+      "images": 126,
+      "patients": 118,
+      "rows_sha256": "1e3d265850a065815012e9a8ea948a0ce4751260ff77173c93291a965e950c5c"
+    },
+    "test": {
+      "images": 131,
+      "patients": 118,
+      "rows_sha256": "b0798ee54ef0822cd3cc60c5f1d724b25e0ed1b310d9b667d0514369f58bfdab"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "f13e53035f53f8475d4ced0fcf375c8c830f885b88fbb1a4150115e5940900a5"
+}

@@ -1,0 +1,144 @@
+{
+  "weight_bits": 8,
+  "act_bits": 8,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 107,
+  "best_val_f1": 81.9754,
+  "best_val_loss": 1.4332,
+  "checkpoint": "models/test_resnet_slim128x64_trim160_8w8a_qat.pth",
+  "student_init_checkpoint": "models/test_resnet_slim128x64_fp32_kd_trim160_ft.pth",
+  "teacher": "resnet18_from_resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 81.203007518797,
+      "precision_weighted": 81.52826401480073,
+      "recall_weighted": 81.203007518797,
+      "f1_weighted": 80.77752136115866
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 81.22834586466166,
+        "lower": 74.43609022556392,
+        "upper": 87.96992481203007
+      },
+      "precision_macro": {
+        "mean": 80.0617666902946,
+        "lower": 71.957702954195,
+        "upper": 87.83809148866432
+      },
+      "recall_macro": {
+        "mean": 75.75389311415289,
+        "lower": 67.49977106227107,
+        "upper": 83.963090513361
+      },
+      "f1_macro": {
+        "mean": 76.86206444472816,
+        "lower": 68.6153341434924,
+        "upper": 84.79063238770685
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 93.25353383458645,
+          "lower": 88.7218045112782,
+          "upper": 96.99248120300751
+        },
+        "precision": {
+          "mean": 85.18890747602677,
+          "lower": 75.0,
+          "upper": 94.0
+        },
+        "recall": {
+          "mean": 97.90576839352165,
+          "lower": 93.10344827586206,
+          "upper": 100.0
+        },
+        "f1": {
+          "mean": 91.02441649279997,
+          "lower": 84.5360824742268,
+          "upper": 96.22641509433963
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 93.25496240601504,
+          "lower": 88.7218045112782,
+          "upper": 96.99248120300751
+        },
+        "precision": {
+          "mean": 94.71378781320564,
+          "lower": 82.35294117647058,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 69.39253776739898,
+          "lower": 50.0,
+          "upper": 86.66666666666667
+        },
+        "f1": {
+          "mean": 79.73250842112193,
+          "lower": 65.0,
+          "upper": 91.30434782608695
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 84.98195488721804,
+          "lower": 78.94736842105263,
+          "upper": 90.97744360902256
+        },
+        "precision": {
+          "mean": 76.15979364739732,
+          "lower": 63.41463414634146,
+          "upper": 88.0
+        },
+        "recall": {
+          "mean": 79.51332910208042,
+          "lower": 66.66666666666666,
+          "upper": 90.69875107665804
+        },
+        "f1": {
+          "mean": 77.60614040858918,
+          "lower": 67.44186046511628,
+          "upper": 86.41975308641975
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 90.96624060150376,
+          "lower": 85.71428571428571,
+          "upper": 95.48872180451127
+        },
+        "precision": {
+          "mean": 64.18457782454868,
+          "lower": 37.5,
+          "upper": 89.47368421052632
+        },
+        "recall": {
+          "mean": 56.2039371936105,
+          "lower": 30.76923076923077,
+          "upper": 80.0
+        },
+        "f1": {
+          "mean": 59.08519245640157,
+          "lower": 35.294117647058826,
+          "upper": 78.78787878787878
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+\section{Background}
+\label{sec:background}
+
+\subsection{Knowledge Distillation}
+\label{sec:bg-kd}
+
+Knowledge distillation transfers the behaviour of a trained teacher network to a
+smaller student by training the student to match the teacher's softened output
+distribution rather than the hard labels alone \cite{hinton2015distilling}. The
+softened targets, obtained by raising the softmax temperature, carry the relative
+confidence the teacher assigns across classes, a richer signal than a one-hot
+label, and the student minimizes a weighted sum of the ordinary cross-entropy and
+a distillation term that aligns the two distributions. A compact student can thus
+reach an accuracy it would not attain from the labels alone, which is what makes
+distillation attractive when the model to be trained is small.
+
+The benefit, however, is not monotone in the teacher's strength. When the teacher
+is much larger than the student, the student cannot reproduce its distribution and
+accuracy degrades instead of improving, an effect attributed to the capacity gap
+between the two networks \cite{cho2019efficacy}. The gap can be bridged with
+intermediate models of decreasing size: a teaching assistant is distilled from
+the large teacher and in turn teaches the student, so that each step spans a
+smaller capacity gap \cite{mirzadeh2020takd}. This staged distillation is the
+principle behind the teacher-assistant scheme described in
+Section~\ref{sec:method-kd}.
+
+\subsection{Neural Network Quantization}
+\label{sec:bg-quant}
+
+Quantization replaces the floating-point weights and activations of a network
+with low-precision fixed-point values, reducing both the memory the model occupies
+and the cost of its arithmetic. A quantizer maps a real value to a finite integer
+grid defined by a scale, a zero point when the representation is asymmetric, and a
+bit-width. The smaller the grid, the cheaper the hardware, but also the larger the
+rounding and clipping error that the network must tolerate.
+
+Two strategies are common. Post-training quantization starts from an already
+trained floating-point network and fixes the quantizer parameters afterwards. In
+practice, this means calibrating activation ranges on representative data and
+mapping each weight tensor to the nearest values on the low-bit grid, by scaling,
+rounding to integer codes, and clipping to the representable range. It is cheap
+because it does not require another optimization run, but at low bit-widths the
+induced error is often too large for the original weights to absorb.
+Quantization-aware training instead inserts fake quantizers during training. A
+model can still be warm-started from a floating-point checkpoint, but the
+low-precision operations are simulated in the forward pass while full-precision
+parameters are retained for the gradient update. The network therefore learns
+weights that tolerate the precision it will use at inference
+\cite{jacob2018quantization}. It costs more to train but loses far less accuracy,
+particularly at low bit-widths, so we use it throughout, through Brevitas, a
+PyTorch library that inserts quantized layers and exports the trained model to a
+quantized ONNX graph \cite{pappalardo2023brevitas}.
+
+\subsection{FPGA Dataflow Inference}
+\label{sec:bg-fpga}
+
+FINN implements a quantized network as a streaming dataflow accelerator. Each
+layer becomes its own hardware block, and the blocks form a pipeline through which
+activations flow, so that every layer is busy on a different piece of data at the
+same time \cite{umuroglu2017finn}. This organization suits low-precision networks,
+because their arithmetic reduces to small fixed-point operations that map directly
+onto the fabric's lookup tables and DSP slices, and the fewer the bits, the less
+logic each operation costs. The original FINN targeted binarized networks; its
+successor FINN-R generalizes the flow to arbitrary low bit-widths, and is the
+toolchain we use \cite{blott2018finnr}.
+
+The generated graph contains both compute blocks and stream-management blocks.
+The compute blocks perform the layer arithmetic, mainly through matrix-vector
+activation units for convolutional and fully connected layers and thresholding
+blocks for quantized activations. The stream-management blocks prepare and move
+data between them: padding and input-generation blocks arrange feature maps for
+convolutions, data-width converters adapt how many bits are carried per cycle,
+and FIFOs buffer values between neighbouring blocks with different rates. The
+important point is that the non-arithmetic blocks are not free. In a fully
+on-chip accelerator, weights, thresholds, and inter-layer buffers all compete for
+FPGA memory, so stream management can become as relevant as the arithmetic itself.
+
+The accelerator exposes a few parameters that trade throughput against resource
+use. For matrix-vector activation units, folding is controlled by the PE and SIMD
+factors. PE replicates output-channel processing, while SIMD replicates
+input-channel processing inside each dot product. Raising either factor reduces
+the number of cycles needed by the corresponding layer, but consumes more lookup
+tables, registers, DSP slices, and often more on-chip memory for weights or
+buffers. Between consecutive blocks, FIFO buffers absorb the mismatch in their
+production and consumption rates and keep the pipeline from stalling. Because the
+accelerator keeps all weights and these FIFOs on chip, the limited on-chip block
+RAM bounds what fits, together with the logic; which of the two binds first
+depends on the network and the folding chosen.

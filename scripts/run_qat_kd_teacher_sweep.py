@@ -116,7 +116,7 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
                     ("test_resnet_slim128x64", 160, 6), ("test_resnet_slim128x64", 160, 8)}:
                 continue
             names = resolve_qat_run(arch, resolution, bit, bit, teacher, seed, experiment)
-            results_dir = root / "results_vgg16" / experiment / names["results_dir_name"]
+            results_dir = root / "runs" / experiment / names["results_dir_name"]
             output_checkpoint = root / "models" / experiment / names["checkpoint_name"]
             if output_checkpoint == fp32_path:
                 raise ValueError("QAT output must not replace the FP32 checkpoint")
@@ -137,7 +137,7 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
                          "experiment_tag": experiment, "warm_start_checkpoint": str(fp32_path),
                          "fp32_source_report": str(path), "sweep_run_fingerprint": run["fingerprint"],
                          "weight_bits": bit, "act_bits": bit, "batch_size": batch_size,
-                         "models_dir": str(root / "models"), "results_dir": str(root / "results_vgg16"),
+                         "models_dir": str(root / "models"), "results_dir": str(root / "runs"),
                          "data_dir": str(data_csv.parent), "csv_file": data_csv.name}
             if layer3:
                 overrides.update(slim_layer3_out=int(layer3), slim_layer4_out=int(layer4))

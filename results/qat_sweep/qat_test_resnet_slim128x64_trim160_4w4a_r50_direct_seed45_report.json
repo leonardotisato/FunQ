@@ -1,0 +1,192 @@
+{
+  "weight_bits": 4,
+  "act_bits": 4,
+  "variant": "slim128x64",
+  "layer3_out": 128,
+  "layer4_out": 64,
+  "n_params": 217892,
+  "epochs": 26,
+  "best_val_f1": 54.4033,
+  "best_val_loss": 4.143,
+  "checkpoint": "/home/leonardo.tisato/EyeGuide/models/qat_kd_teacher_sweep_20260703_121750_v2/test_resnet_slim128x64_trim160_4w4a_r50_direct_seed45_qat.pth",
+  "checkpoint_sha256": "c51ceb5c31aa8ad8b9eac92b8b08c9817e245e092e795e47bb4bbd628a02dec0",
+  "student_init_checkpoint": "/home/leonardo.tisato/EyeGuide/models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r50_direct_seed45_ft.pth",
+  "student_init_mode": "fp32_checkpoint",
+  "teacher": "resnet50_fp32_kd.pth (512x512 full-image strong train / test eval)",
+  "student_resolution": 160,
+  "teacher_resolution": 512,
+  "input_size": [
+    1,
+    3,
+    160,
+    160
+  ],
+  "kd_temperature": 3.0,
+  "kd_alpha": 0.25,
+  "test_metrics": {
+    "point_metrics_pct": {
+      "accuracy_overall": 48.091603053435115,
+      "precision_weighted": 46.2560438632997,
+      "recall_weighted": 48.091603053435115,
+      "f1_weighted": 44.759394115413706
+    },
+    "bootstrap_ci_pct": {
+      "accuracy_overall": {
+        "mean": 48.08519083969466,
+        "lower": 39.69465648854962,
+        "upper": 56.48854961832062
+      },
+      "precision_macro": {
+        "mean": 44.03925683625374,
+        "lower": 28.259394790524905,
+        "upper": 62.228365005181466
+      },
+      "recall_macro": {
+        "mean": 39.46611762743686,
+        "lower": 32.575268364301536,
+        "upper": 46.81851604278074
+      },
+      "f1_macro": {
+        "mean": 37.66119962063716,
+        "lower": 29.951969473754353,
+        "upper": 46.4613533714529
+      }
+    },
+    "class_one_vs_rest_bootstrap_ci_pct": {
+      "healthy": {
+        "accuracy": {
+          "mean": 77.84916030534352,
+          "lower": 70.99236641221374,
+          "upper": 84.7328244274809
+        },
+        "precision": {
+          "mean": 63.940444737879275,
+          "lower": 51.5625,
+          "upper": 75.75757575757575
+        },
+        "recall": {
+          "mean": 84.73194504971576,
+          "lower": 73.68421052631578,
+          "upper": 94.28571428571428
+        },
+        "f1": {
+          "mean": 72.69909699143811,
+          "lower": 62.365591397849464,
+          "upper": 81.72043010752688
+        }
+      },
+      "melanoma": {
+        "accuracy": {
+          "mean": 74.82564885496184,
+          "lower": 67.17557251908397,
+          "upper": 81.67938931297711
+        },
+        "precision": {
+          "mean": 35.92397020275392,
+          "lower": 16.666666666666664,
+          "upper": 55.55555555555556
+        },
+        "recall": {
+          "mean": 34.56371490953874,
+          "lower": 16.666666666666664,
+          "upper": 54.166666666666664
+        },
+        "f1": {
+          "mean": 34.769614884982694,
+          "lower": 17.38755622188909,
+          "upper": 51.51759530791785
+        }
+      },
+      "nevus": {
+        "accuracy": {
+          "mean": 54.94908396946565,
+          "lower": 46.56488549618321,
+          "upper": 63.358778625954194
+        },
+        "precision": {
+          "mean": 32.557052880572236,
+          "lower": 19.047619047619047,
+          "upper": 46.93877551020408
+        },
+        "recall": {
+          "mean": 31.85677587416643,
+          "lower": 18.51851851851852,
+          "upper": 46.0
+        },
+        "f1": {
+          "mean": 31.952574552914275,
+          "lower": 19.27710843373494,
+          "upper": 44.44444444444444
+        }
+      },
+      "chrpe": {
+        "accuracy": {
+          "mean": 88.54648854961832,
+          "lower": 83.20610687022901,
+          "upper": 93.89312977099237
+        },
+        "precision": {
+          "mean": 43.73555952380953,
+          "lower": 0.0,
+          "upper": 100.0
+        },
+        "recall": {
+          "mean": 6.712034676326492,
+          "lower": 0.0,
+          "upper": 22.22222222222222
+        },
+        "f1": {
+          "mean": 11.223512053213579,
+          "lower": 0.0,
+          "upper": 35.294117647058826
+        }
+      }
+    }
+  },
+  "qat_hyperparameters": {
+    "lr": 1e-05,
+    "max_epochs": 200,
+    "weight_decay": 0.0001,
+    "patience": 50,
+    "calibration_batches": 100,
+    "bn_freeze_epoch": 5
+  },
+  "teacher_mode": "r50_direct",
+  "teacher_arch": "resnet50",
+  "teacher_checkpoint": "/home/leonardo.tisato/EyeGuide/models/resnet50_fp32_kd.pth",
+  "teacher_checkpoint_sha256": "979b5f009c7932f48c909a749e7911b073b5b132d6d8e8d60a9b80bf99e97a0e",
+  "student_init_checkpoint_sha256": "4339c727d5d6b9fa31540e2c5b29b0be3f8377e9fb6a3b00d1ec7b41d3ec7e42",
+  "experiment_tag": "qat_kd_teacher_sweep_20260703_121750_v2",
+  "random_seed": 45,
+  "split_seed": 45,
+  "qat_seed": 45,
+  "fp32_seed": 45,
+  "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+  "fp32_source_report": "/home/leonardo.tisato/EyeGuide/results_vgg16/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_trim160_r50_direct_seed45/train_test_resnet_slim128x64_trim160_r50_direct_seed45_report.json",
+  "fp32_source_report_sha256": "a86a0e4e98ee1e4b8e133f1a56fb3581b40bacc18e0559f33b298935612754ad",
+  "data_csv": "/home/leonardo.tisato/EyeGuide/Data/fundus_data_final.csv",
+  "data_csv_sha256": "aaacc759d0d4b10e61cb8604082b037f395c20e1645144da702b075b25cab376",
+  "patient_splits": {
+    "train": {
+      "images": 607,
+      "patients": 548,
+      "rows_sha256": "204d19b89c45bf0a08c829bcfc42d236e25cd99de45d3f125498f4acf7915740"
+    },
+    "validation": {
+      "images": 126,
+      "patients": 118,
+      "rows_sha256": "1e3d265850a065815012e9a8ea948a0ce4751260ff77173c93291a965e950c5c"
+    },
+    "test": {
+      "images": 131,
+      "patients": 118,
+      "rows_sha256": "b0798ee54ef0822cd3cc60c5f1d724b25e0ed1b310d9b667d0514369f58bfdab"
+    }
+  },
+  "patient_split_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sweep_run_fingerprint": "e35adebda754ea8fcf7620348d72d85a69ff5b57f471777d13a8675d93b22c4c"
+}
