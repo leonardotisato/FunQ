@@ -41,4 +41,5 @@ After a sweep, copy its `*_report.json` files into `results/` and regenerate the
 
 ```bash
 python scripts/plot_kd_u250_results.py   # writes analysis/kd_u250/
+python scripts/plot_qat_sweep.py         # writes analysis/qat_sweep/
 ```
