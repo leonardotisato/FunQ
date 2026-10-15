@@ -21,3 +21,6 @@ Data/
 .*/
 build_*/
 board_*/
+
+# archived experiment code, kept only on the training VM
+experiments-archive/

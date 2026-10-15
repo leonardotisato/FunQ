@@ -21,7 +21,6 @@ deployed with FINN on Alveo U250 and Ultra96-v2-G.
 | `report/` | LaTeX report |
 | `docs/` | How-tos: `qat_sweep.md`, `finn_builds.md` |
 | `tests/` | Unit tests for the sweep helpers (`python -m unittest discover -s tests`) |
-| `experiments-archive/` | Code of abandoned model families, kept for reference |
 | `CHANGELOG.md` | Experiment diary |
 
 ## Training VM (dwarf5, `~/EyeGuide`)
@@ -36,6 +35,7 @@ Large artifacts live only on the VM and are gitignored:
 | `logs/` | Per-run stdout logs; `logs/hydra/` holds Hydra run folders |
 | `build/` | Full FINN build folders with bitstreams (`u250/`, `ultra96/`) |
 | `venv/` | Python environment for training (`source venv/bin/activate`) |
+| `experiments-archive/` | Code of abandoned model families (MobileNetV1, ResNet18, custom nets), kept for reference |
 
 After a sweep, copy its `*_report.json` files into `results/` and regenerate the analysis:
 
