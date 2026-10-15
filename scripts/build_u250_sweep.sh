@@ -1,6 +1,6 @@
 #!/bin/bash
-# Build the 12 swept QAT configurations (Base/Slim x 160/192/224 px x 6/8-bit) for the Alveo U250
-# at --target-fps 5000, i.e. each configuration's maximum throughput. One build at a time (~9 h each).
+# Build the swept QAT configurations (Base/Slim x 160/192/224 px x 6/8-bit) that have no U250 build
+# yet, at --target-fps 5000, i.e. each configuration's maximum throughput. One build at a time (~9 h each).
 #
 # Weights come from the matched QAT sweep, seed 42, ResNet18 teacher-assistant run; throughput and
 # area do not depend on the weights, board accuracy can be checked against that run's report.
@@ -21,7 +21,8 @@ LOGS=logs/hw_sweep
 TMP_ROOT=/tmp/finn_hw_sweep
 TARGET_FPS=5000
 
-# Configurations without any U250 build first, then rebuilds of those built from pre-sweep checkpoints.
+# The other six configurations already have 5000fps builds in build/u250/ (pre-sweep checkpoints;
+# the Base 224 ones untrimmed). Add them here only to rebuild them from sweep weights.
 CONFIGS=(
   test_resnet_trim160_8w8a
   test_resnet_trim192_8w8a
@@ -29,12 +30,6 @@ CONFIGS=(
   test_resnet_slim128x64_trim192_8w8a
   test_resnet_slim128x64_trim224_6w6a
   test_resnet_slim128x64_trim224_8w8a
-  test_resnet_trim224_6w6a
-  test_resnet_trim224_8w8a
-  test_resnet_trim160_6w6a
-  test_resnet_trim192_6w6a
-  test_resnet_slim128x64_trim160_6w6a
-  test_resnet_slim128x64_trim160_8w8a
 )
 
 mkdir -p "$STAGE" "$OUT" "$LOGS"
