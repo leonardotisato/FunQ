@@ -155,7 +155,8 @@ def patch_u250_vitis_platform():
 
 
 def _vitis_link_projects():
-    tmp_root = Path("/tmp") / f"finn_dev_{getpass.getuser()}"
+    # FINN_BUILD_DIR is set by run-docker.sh; per-build values keep parallel builds apart.
+    tmp_root = Path(os.environ.get("FINN_BUILD_DIR", f"/tmp/finn_dev_{getpass.getuser()}"))
     return {Path(p) for p in glob.glob(str(tmp_root / "vitis_link_proj_*"))}
 
 
