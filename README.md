@@ -1,4 +1,4 @@
-# Fundus Image Classification on FPGA
+# FunQ: Quantized Fundus Classification on FPGA
 
 4-class fundus-image classification with a small quantized ResNet (`test_resnet` and its
 slim 128/64 variant), trained with knowledge distillation, quantized with Brevitas QAT and
