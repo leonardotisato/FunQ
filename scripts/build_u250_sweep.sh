@@ -73,7 +73,9 @@ build_all() {
       rm -rf "$tmp"  # this build's own FINN scratch; reports and bitfile are already in $dir
       log "DONE $c"
     else
-      log "FAILED $c (log $LOGS/build_$c.log, scratch kept in $tmp)"
+      # Stop the queue: failures so far were environmental (e.g. HLS IP export) and would repeat.
+      log "FAILED $c (log $LOGS/build_$c.log, scratch kept in $tmp); queue stopped"
+      return 1
     fi
   done
   log "queue finished"
@@ -82,7 +84,7 @@ build_all() {
 for step in "$@"; do
   case "$step" in
     export) export_all || exit 1 ;;
-    build) build_all ;;
+    build) build_all || exit 1 ;;
     *) echo "usage: $0 [export] [build]"; exit 2 ;;
   esac
 done

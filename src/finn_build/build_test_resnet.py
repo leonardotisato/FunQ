@@ -345,11 +345,14 @@ cfg = DataflowBuildConfig(
     save_intermediate_models=True,
     split_large_fifos=True,
     default_swg_exception=True,
+    # Fail with an exit code instead of waiting at a pdb prompt, so unattended queues stop cleanly.
+    enable_build_pdb_debug=False,
 )
 
 vitis_projects_before = _vitis_link_projects()
 build_start_time = time.time()
-build_dataflow_cfg(args.onnx, cfg)
+if build_dataflow_cfg(args.onnx, cfg) != 0:
+    sys.exit(1)
 
 if shell_flow_type == ShellFlowType.VITIS_ALVEO and not args.estimates_only and not args.stop_after:
     _copy_vitis_reports(args.output_dir, vitis_projects_before, build_start_time)

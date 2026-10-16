@@ -55,7 +55,10 @@ fi
 # Mount this repo into the FINN container as-is so local build scripts and models
 # are accessible from the same absolute path inside the container. Override the
 # container workdir to the repo root when launching the default interactive shell.
-export FINN_DOCKER_EXTRA="${FINN_DOCKER_EXTRA:-} -v $REPO_DIR:$REPO_DIR -w $REPO_DIR -e TCLLIBPATH=$FINN_TCLLIBPATH "
+# XILINX_LOCAL_USER_DATA=no: each container starts with an empty ~/.Xilinx, and parallel HLS workers
+# racing to install the Tcl app store there made some IP exports fail ("Unable to load Tcl app
+# xilinx::xsim"), which surfaced later as "IP definition not found" in CreateStitchedIP.
+export FINN_DOCKER_EXTRA="${FINN_DOCKER_EXTRA:-} -v $REPO_DIR:$REPO_DIR -w $REPO_DIR -e TCLLIBPATH=$FINN_TCLLIBPATH -e XILINX_LOCAL_USER_DATA=no "
 
 cd "$FINN_ROOT"
 
