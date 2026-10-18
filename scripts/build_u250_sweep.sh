@@ -1,6 +1,7 @@
 #!/bin/bash
-# Build the swept QAT configurations (Base/Slim x 160/192/224 px x 6/8-bit) that have no U250 build
-# yet, at --target-fps 5000, i.e. each configuration's maximum throughput. One build at a time (~9 h each).
+# Build swept QAT configurations (Base/Slim x 160/192/224 px x 6/8-bit) for the U250 at their maximum
+# throughput: --target-fps 5000, above every configuration's limit, except the overrides below.
+# One build at a time (~12 h each).
 #
 # Weights come from the matched QAT sweep, seed 42, ResNet18 teacher-assistant run; throughput and
 # area do not depend on the weights, board accuracy can be checked against that run's report.
@@ -21,8 +22,9 @@ LOGS=logs/hw_sweep
 TMP_ROOT=/tmp/finn_hw_sweep
 TARGET_FPS=5000
 
-# The other six configurations already have 5000fps builds in build/u250/ (pre-sweep checkpoints;
-# the Base 224 ones untrimmed). Add them here only to rebuild them from sweep weights.
+# The remaining configurations already reach their limit in the 5000fps builds in build/u250/
+# (pre-sweep checkpoints; the Base 224 ones untrimmed). Base 160 6-bit is listed again because its
+# 5000fps build stopped short of the limit (see TARGET_FPS_OVERRIDE).
 CONFIGS=(
   test_resnet_trim160_8w8a
   test_resnet_trim192_8w8a
@@ -30,6 +32,16 @@ CONFIGS=(
   test_resnet_slim128x64_trim192_8w8a
   test_resnet_slim128x64_trim224_6w6a
   test_resnet_slim128x64_trim224_8w8a
+  test_resnet_trim160_6w6a
+)
+
+# At 5000 fps (20000 cycles/frame) FINN keeps the last max-pool at PE=1 (19200 cycles), and the
+# depthwise window generator feeding it inherits SIMD=1 and becomes the bottleneck (28199 cycles,
+# 3546 fps). 5300 fps (18868 cycles) makes FINN raise that PE, so Base 160 reaches its limit,
+# the first layer at one input pixel per cycle (26246 cycles, 3810 fps).
+declare -A TARGET_FPS_OVERRIDE=(
+  [test_resnet_trim160_8w8a]=5300
+  [test_resnet_trim160_6w6a]=5300
 )
 
 mkdir -p "$STAGE" "$OUT" "$LOGS"
@@ -61,14 +73,15 @@ export_all() {
 
 build_all() {
   for c in "${CONFIGS[@]}"; do
-    local dir="$OUT/build_finn_${c}_u250_${TARGET_FPS}fps"
-    local tmp="$TMP_ROOT/$c"
+    local fps="${TARGET_FPS_OVERRIDE[$c]:-$TARGET_FPS}"
+    local dir="$OUT/build_finn_${c}_u250_${fps}fps"
+    local tmp="$TMP_ROOT/${c}_${fps}fps"
     if [ -f "$dir/bitfile/finn-accel.xclbin" ]; then log "skip $c (bitfile present)"; continue; fi
     [ -f "$STAGE/$c.onnx" ] || { log "skip $c (no ONNX)"; continue; }
     log "START $c  (free on /tmp: $(df -h --output=avail /tmp | tail -1 | tr -d ' '))"
     FINN_HOST_BUILD_DIR="$tmp" FINN_SKIP_DEP_REPOS=1 bash run_finn.sh \
       python3 src/finn_build/build_test_resnet.py --board U250 --onnx "$STAGE/$c.onnx" \
-      --output-dir "$dir" --target-fps "$TARGET_FPS" > "$LOGS/build_$c.log" 2>&1
+      --output-dir "$dir" --target-fps "$fps" > "$LOGS/build_${c}_${fps}fps.log" 2>&1
     if [ -f "$dir/bitfile/finn-accel.xclbin" ]; then
       rm -rf "$tmp"  # this build's own FINN scratch; reports and bitfile are already in $dir
       log "DONE $c"
