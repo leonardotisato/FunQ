@@ -73,6 +73,8 @@ export_all() {
 
 build_all() {
   for c in "${CONFIGS[@]}"; do
+    # ONLY="cfg1 cfg2" restricts the queue to those configurations.
+    if [ -n "${ONLY:-}" ] && [[ " $ONLY " != *" $c "* ]]; then continue; fi
     local fps="${TARGET_FPS_OVERRIDE[$c]:-$TARGET_FPS}"
     local dir="$OUT/build_finn_${c}_u250_${fps}fps"
     local tmp="$TMP_ROOT/${c}_${fps}fps"
