@@ -35,6 +35,9 @@ parser.add_argument("--start-from", default=None,
                     help="Resume from this step using the previous intermediate checkpoint in --output-dir.")
 parser.add_argument("--synth-clk-ns", type=float, default=10.0)
 parser.add_argument("--target-fps", type=int, default=1)
+parser.add_argument("--two-pass-relaxation", action="store_true",
+                    help="If some layer cannot reach --target-fps, refold all layers to that layer's cycles "
+                         "(minimum area at the achievable throughput).")
 parser.add_argument("--folding-config", default=None,
                     help="Manual folding config JSON. If None, uses target_fps auto-folding.")
 parser.add_argument("--manual-fifo-depths", action="store_true",
@@ -337,7 +340,7 @@ cfg = DataflowBuildConfig(
     shell_flow_type=shell_flow_type,
     target_fps=args.target_fps,
     mvau_wwidth_max=mvau_wwidth_max,
-    folding_two_pass_relaxation=False,
+    folding_two_pass_relaxation=args.two_pass_relaxation,
     vitis_opt_strategy=vitis_opt_strategy,
     folding_config_file=args.folding_config,
     auto_fifo_depths=not args.manual_fifo_depths,
