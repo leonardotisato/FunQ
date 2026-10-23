@@ -42,6 +42,10 @@ CONFIGS=(
 declare -A TARGET_FPS_OVERRIDE=(
   [test_resnet_trim160_8w8a]=5300
   [test_resnet_trim160_6w6a]=5300
+  # Slim 224 at 5000 fps was killed twice in Vivado placement (~30 GB, VM has 31 GB). 2000 fps
+  # already reaches its limit (51078 cycles, 1958 fps) with ~40% fewer DSPs and ~half the BRAM.
+  [test_resnet_slim128x64_trim224_6w6a]=2000
+  [test_resnet_slim128x64_trim224_8w8a]=2000
 )
 
 mkdir -p "$STAGE" "$OUT" "$LOGS"
