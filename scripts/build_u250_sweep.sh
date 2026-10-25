@@ -66,6 +66,12 @@ if [ "${RELAXED:-0}" = 1 ]; then
   OUT=build/u250/relaxed
   RELAX_ARGS=(--two-pass-relaxation)
   NAME_SUFFIX=_relaxed
+  # Needs the local FINN SetFolding patch that also checks the cycles of the SWU in front of a
+  # max-pool; without it the stem max-pool SWU caps every network at ~80% of its limit.
+  if ! grep -q "HPPS patch: the SWU inherits" "${HPPS_FINN_ROOT:-$HOME/finn}/src/finn/transformation/fpgadataflow/set_folding.py"; then
+    echo "FINN checkout lacks the SetFolding SWU patch (HPPS patch in set_folding.py); not building" >&2
+    exit 1
+  fi
 fi
 
 mkdir -p "$STAGE" "$OUT" "$LOGS"
@@ -109,6 +115,7 @@ build_all() {
       python3 src/finn_build/build_test_resnet.py --board U250 --onnx "$STAGE/$c.onnx" \
       --output-dir "$dir" --target-fps "$fps" "${RELAX_ARGS[@]}" > "$LOGS/build_${c}_${fps}fps${NAME_SUFFIX}.log" 2>&1
     if [ -f "$dir/bitfile/finn-accel.xclbin" ]; then
+      git -C "${HPPS_FINN_ROOT:-$HOME/finn}" diff > "$dir/finn.diff"  # local FINN patches used
       rm -rf "$tmp"  # this build's own FINN scratch; reports and bitfile are already in $dir
       log "DONE $c"
     else
