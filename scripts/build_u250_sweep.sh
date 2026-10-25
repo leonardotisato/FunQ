@@ -8,6 +8,7 @@
 #
 # Run on the training VM from the repo root, inside tmux:
 #   tmux new -s hwbuild 'bash scripts/build_u250_sweep.sh export build 2>&1 | tee -a logs/hw_sweep/queue.log'
+#   RELAXED=1 bash scripts/build_u250_sweep.sh export build   # minimum-area set, see below
 # Steps: "export" writes models/hw_sweep/<config>.onnx; "build" runs the FINN queue.
 # Finished builds (bitfile present) are skipped, so the queue can be restarted.
 
@@ -48,6 +49,25 @@ declare -A TARGET_FPS_OVERRIDE=(
   [test_resnet_slim128x64_trim224_8w8a]=2000
 )
 
+# RELAXED=1: all 12 configurations at --target-fps 10000 with FINN two-pass relaxation. The first
+# pass finds the true bottleneck (first layer); the second refolds every layer to its cycles, so no
+# layer is parallelised beyond what that throughput needs (no overrides apply in this mode).
+RELAX_ARGS=()
+NAME_SUFFIX=""
+if [ "${RELAXED:-0}" = 1 ]; then
+  CONFIGS=()
+  for arch in test_resnet test_resnet_slim128x64; do
+    for res in 160 192 224; do
+      for b in 6w6a 8w8a; do CONFIGS+=("${arch}_trim${res}_${b}"); done
+    done
+  done
+  TARGET_FPS=10000
+  TARGET_FPS_OVERRIDE=()
+  OUT=build/u250/relaxed
+  RELAX_ARGS=(--two-pass-relaxation)
+  NAME_SUFFIX=_relaxed
+fi
+
 mkdir -p "$STAGE" "$OUT" "$LOGS"
 log() { echo "[$(date '+%F %T')] $*"; }
 
@@ -80,20 +100,20 @@ build_all() {
     # ONLY="cfg1 cfg2" restricts the queue to those configurations.
     if [ -n "${ONLY:-}" ] && [[ " $ONLY " != *" $c "* ]]; then continue; fi
     local fps="${TARGET_FPS_OVERRIDE[$c]:-$TARGET_FPS}"
-    local dir="$OUT/build_finn_${c}_u250_${fps}fps"
-    local tmp="$TMP_ROOT/${c}_${fps}fps"
+    local dir="$OUT/build_finn_${c}_u250_${fps}fps${NAME_SUFFIX}"
+    local tmp="$TMP_ROOT/${c}_${fps}fps${NAME_SUFFIX}"
     if [ -f "$dir/bitfile/finn-accel.xclbin" ]; then log "skip $c (bitfile present)"; continue; fi
     [ -f "$STAGE/$c.onnx" ] || { log "skip $c (no ONNX)"; continue; }
-    log "START $c  (free on /tmp: $(df -h --output=avail /tmp | tail -1 | tr -d ' '))"
+    log "START $c ${fps}fps${NAME_SUFFIX}  (free on /tmp: $(df -h --output=avail /tmp | tail -1 | tr -d ' '))"
     FINN_HOST_BUILD_DIR="$tmp" FINN_SKIP_DEP_REPOS=1 bash run_finn.sh \
       python3 src/finn_build/build_test_resnet.py --board U250 --onnx "$STAGE/$c.onnx" \
-      --output-dir "$dir" --target-fps "$fps" > "$LOGS/build_${c}_${fps}fps.log" 2>&1
+      --output-dir "$dir" --target-fps "$fps" "${RELAX_ARGS[@]}" > "$LOGS/build_${c}_${fps}fps${NAME_SUFFIX}.log" 2>&1
     if [ -f "$dir/bitfile/finn-accel.xclbin" ]; then
       rm -rf "$tmp"  # this build's own FINN scratch; reports and bitfile are already in $dir
       log "DONE $c"
     else
       # Stop the queue: failures so far were environmental (e.g. HLS IP export) and would repeat.
-      log "FAILED $c (log $LOGS/build_$c.log, scratch kept in $tmp); queue stopped"
+      log "FAILED $c (log $LOGS/build_${c}_${fps}fps${NAME_SUFFIX}.log, scratch kept in $tmp); queue stopped"
       return 1
     fi
   done
