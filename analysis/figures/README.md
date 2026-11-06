@@ -53,6 +53,27 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 > increasing throughput with stock FINN folding. From 108 to 3,810 FPS (35×) LUTs grow 1.8× and DSPs 45×;
 > most LUT, FF and BRAM use is independent of throughput. BRAM counts an 18K block as half a 36K block.
 
+## U250 resources of the minimum-area builds
+
+Post-synthesis use of each minimum-area build (`results/hw/u250/<build>/report/post_synth_resources.json`),
+including the platform shell; % of the U250. BRAM counts an 18K block as half a 36K block. Max clock is the
+frequency Vitis reports achievable after routing; every build runs at the 100 MHz kernel clock.
+
+| Network | Input | FPS | LUT | FF | BRAM (36K) | URAM | DSP | Max clock (MHz) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Base 6-bit | 160 px | 3,810 | 237,850 (13.8%) | 310,782 (9.0%) | 402.5 (15.0%) | 6 | 2,817 (22.9%) | 105.4 |
+| Base 6-bit | 192 px | 2,657 | 243,019 (14.1%) | 311,352 (9.0%) | 402.5 (15.0%) | 8 | 2,817 (22.9%) | 104.8 |
+| Base 6-bit | 224 px | 1,958 | 245,317 (14.2%) | 311,579 (9.0%) | 401 (14.9%) | 10 | 2,817 (22.9%) | 105.0 |
+| Base 8-bit | 160 px | 3,810 | 269,482 (15.6%) | 348,927 (10.1%) | 665 (24.7%) | 6 | 2,817 (22.9%) | 104.4 |
+| Base 8-bit | 192 px | 2,657 | 276,529 (16.0%) | 349,500 (10.1%) | 664.5 (24.7%) | 8 | 2,817 (22.9%) | 103.6 |
+| Base 8-bit | 224 px | 1,958 | 279,167 (16.2%) | 349,478 (10.1%) | 664 (24.7%) | 10 | 2,817 (22.9%) | 104.9 |
+| Slim 6-bit | 160 px | 3,810 | 231,553 (13.4%) | 299,628 (8.7%) | 353.5 (13.2%) | 4 | 2,573 (20.9%) | 104.7 |
+| Slim 6-bit | 192 px | 2,657 | 236,467 (13.7%) | 300,188 (8.7%) | 352.5 (13.1%) | 6 | 2,573 (20.9%) | 121.4 |
+| Slim 6-bit | 224 px | 1,958 | 238,687 (13.8%) | 300,334 (8.7%) | 353.5 (13.2%) | 9 | 2,573 (20.9%) | 105.8 |
+| Slim 8-bit | 160 px | 3,810 | 262,094 (15.2%) | 334,025 (9.7%) | 536 (19.9%) | 4 | 2,573 (20.9%) | 104.7 |
+| Slim 8-bit | 192 px | 2,657 | 268,860 (15.6%) | 334,650 (9.7%) | 535 (19.9%) | 6 | 2,573 (20.9%) | 105.5 |
+| Slim 8-bit | 224 px | 1,958 | 271,638 (15.7%) | 334,904 (9.7%) | 536 (19.9%) | 9 | 2,573 (20.9%) | 108.7 |
+
 ## Notes for the text
 
 - QAT belongs to the teacher-assistant pipeline, so all QAT figures use the ResNet18-TA runs only.
