@@ -309,25 +309,39 @@ def fig_u250_accuracy_vs_area(builds, runs, out):
 
 
 def fig_u250_slim_area(builds, out):
-    """Resource use of Slim 160 6-bit across throughput targets (stock FINN folding)."""
-    pts = sorted([b for b in builds if b["architecture"] == "test_resnet_slim128x64" and b["precision"] == "6w6a"
-                  and b["resolution"] == 160 and b["flow"] == "stock" and b["target"].endswith("fps")],
-                 key=lambda b: b["throughput_fps"])
-    check(len(pts) == 6, f"Expected six stock Slim 160 6-bit builds, found {len(pts)}")
+    """Resource use of Slim 160 6-bit across throughput targets.
+
+    Below the throughput limit stock folding already meets each target, so relaxation and the SWU patch
+    would not change those builds; at the limit the minimum-area build replaces the over-provisioned
+    stock 5000fps one.
+    """
+    slim160 = [b for b in builds if b["architecture"] == "test_resnet_slim128x64" and b["precision"] == "6w6a"
+               and b["resolution"] == 160 and b["target"].endswith("fps")]
+    pts = sorted([b for b in slim160 if b["flow"] == "relaxed_swu_patch"
+                  or (b["flow"] == "stock" and b["target"] != "5000fps")], key=lambda b: b["throughput_fps"])
+    check(len(pts) == 6, f"Expected six Slim 160 6-bit builds, found {len(pts)}")
     styles = {"DSP": ("#e87ba4", "D", "-"), "LUT": ("#008300", "o", "-"),
               "BRAM": ("#6250d6", "s", "-"), "FF": ("#e34948", "^", "-")}
     fig, ax = plt.subplots(figsize=(COLUMN, 2.1))
     xs = [b["throughput_fps"] for b in pts]
+    ends = {}
     for resource, (color, marker, line) in styles.items():
         ys = [b[f"{resource}_pct"] for b in pts]
         ax.plot(xs, ys, color=color, linestyle=line, linewidth=1.2, marker=marker, markersize=3.5,
                 markerfacecolor=color, markeredgewidth=0)
-        ax.annotate(resource, (xs[-1], ys[-1]), xytext=(4, 0), textcoords="offset points", va="center", fontsize=7)
+        ends[resource] = ys[-1]
+    # End labels, nudged apart where lines finish close together (min gap in % of the device).
+    placed = []
+    for resource, y in sorted(ends.items(), key=lambda item: item[1]):
+        y_label = max(y, placed[-1] + 1.6) if placed else y
+        placed.append(y_label)
+        ax.annotate(resource, (xs[-1], y), xytext=(xs[-1] * 1.08, y_label), textcoords="data",
+                    va="center", fontsize=7)
     ax.set_xscale("log")
     ax.set_xticks([100, 200, 500, 1000, 2000, 4000], ["100", "200", "500", "1k", "2k", "4k"])
     ax.minorticks_off()
     ax.set_xlim(90, 5200)
-    ax.set_ylim(0, 36)
+    ax.set_ylim(0, 24)
     ax.set_xlabel("Throughput (FPS)")
     ax.set_ylabel("U250 resources used (%)")
     ax.grid(color=GRID, linewidth=0.5, zorder=0)

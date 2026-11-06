@@ -49,9 +49,12 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 > at all input sizes.
 
 **`u250_slim160_6bit_area_vs_throughput`**
-> U250 resources (post-synthesis, % of the device) used by Slim, 160 px, 6-bit, built for
-> increasing throughput with stock FINN folding. From 108 to 3,810 FPS (35×) LUTs grow 1.8× and DSPs 45×;
-> most LUT, FF and BRAM use is independent of throughput. BRAM counts an 18K block as half a 36K block.
+> U250 resources (post-synthesis, % of the device) used by Slim, 160 px, 6-bit, built for increasing
+> throughput. From 108 to 3,810 FPS (35×) LUTs grow 1.5× and DSPs 28×; most LUT, FF and BRAM use is
+> independent of throughput. The 3,810 FPS point is the minimum-area build; the lower points are stock
+> FINN builds for targets of 100–2,000 FPS, which they meet (the 200 FPS target reaches 193 FPS), so
+> relaxation would not change them. The stock 5,000 FPS build reaches the same 3,810 FPS with 34% of
+> the DSPs instead of 21%. BRAM counts an 18K block as half a 36K block.
 
 ## U250 resources of the minimum-area builds
 
