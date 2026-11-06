@@ -191,6 +191,7 @@ def collect_finn(provenance):
         check(ishape == (1, resolution, resolution, 3), f"Unexpected input: {directory}")
         if "_trim" in topology:
             check(int(topology.rsplit("_trim", 1)[1]) == resolution, f"Resolution mismatch: {directory}")
+        target = target.removesuffix("_relaxed")
         target_fps = int(target.removesuffix("fps")) if target.endswith("fps") else None
         fps = report["estimated_throughput_fps"]
         period = report["estimated_latency_ns"] / report["critical_path_cycles"]

@@ -34,19 +34,21 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 > As above, including 4-bit QAT; the y-axis starts at 50%.
 
 **`u250_max_throughput`**
-> Maximum throughput of each configuration on the Alveo U250 (FINN dataflow accelerator at
-> 100 MHz). Slim at 160 px reaches 3,810 FPS at both 6 and 8 bits; Base
-> at 224 px is limited to 1,958 FPS.
+> Maximum throughput of each configuration on the Alveo U250 (FINN dataflow accelerator at 100 MHz;
+> all 12 builds meet timing, so these are the on-board rates). Throughput depends only on input size:
+> the first layer takes one input pixel per clock, so the limit is 100 MHz / (H+2)² = 3,810, 2,657 and
+> 1,958 FPS at 160, 192 and 224 px, for both architectures and bit-widths. Each build reaches this limit
+> with the least parallelism FINN finds for it (minimum-area builds, see notes).
 
 **`u250_accuracy_vs_throughput`**
-> Mean QAT test accuracy (TA teacher, 5 seeds) against the maximum U250 throughput of each built configuration
-> (`u250_max_throughput`). 6- and 8-bit builds of the same model reach the same throughput: FINN picks
-> the same parallelism for both, and bit-width only changes area.
+> Mean QAT test accuracy (TA teacher, 5 seeds) against the maximum U250 throughput of each
+> configuration (`u250_max_throughput`). Configurations with the same input size share one
+> throughput; architecture and bit-width change accuracy and area, not speed.
 
 **`u250_slim160_6bit_area_vs_throughput`**
 > U250 resources (post-synthesis, % of the device) used by Slim, 160 px, 6-bit, built for
-> increasing throughput. From 108 to 3,810 FPS (35×) LUTs grow 1.8× and DSPs 45×; most LUT,
-> FF and BRAM use is independent of throughput. BRAM counts an 18K block as half a 36K block.
+> increasing throughput with stock FINN folding. From 108 to 3,810 FPS (35×) LUTs grow 1.8× and DSPs 45×;
+> most LUT, FF and BRAM use is independent of throughput. BRAM counts an 18K block as half a 36K block.
 
 ## Notes for the text
 
@@ -60,11 +62,22 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 
 - Teacher, input size and architecture differences are within the seed-to-seed spread
   (SD 2–4 pp on 133 test images); the figures do not support ranking them.
-- The U250 builds were made from earlier single-seed checkpoints. Throughput and area depend on
-  architecture, input size and bit-width, not on the trained weights, so `u250_accuracy_vs_throughput`
-  pairs each build with the sweep accuracy of its configuration. The 224 px builds used the untrimmed
-  preprocessing; the trim is a host-side crop and the accelerator only adds normalization, so the
-  hardware is identical and their accuracy comes from the 224 px (trimmed) sweep.
+- Minimum-area builds (`flow = relaxed_swu_patch` in `results/hw/builds.csv`): FINN two-pass relaxation
+  (first fold for a 10,000 FPS target, then refold every layer to the cycles of the slowest one) plus a
+  local fix to FINN's `SetFolding`: the window generator in front of a max-pool copies the pool's
+  parallelism without checking its own cycles, which left every network at ~80% of its limit. Only
+  pool folding changes; all compute layers keep the relaxed folding. All 12 meet 100 MHz with margin
+  (Vitis reports 103.6–121.4 MHz achievable); the kernel clock stays at 100 MHz.
+- With minimum-area folding, area hardly depends on input size: every Base build uses 2,817 DSPs and
+  every Slim build 2,573; LUTs are 13–16% of the device (post-synthesis, including the platform shell's
+  ~57k fixed LUTs). The earlier builds that reach the same throughput with stock folding (`flow = stock`,
+  targets 2,000–5,300 FPS) use 37–64% more DSPs and 18–42% more non-shell LUTs; they are kept as the
+  over-provisioned comparison and are not plotted.
+- The plotted builds use the QAT sweep checkpoints (seed 42, TA teacher) with the black-border trim
+  at every input size. Throughput and area do not depend on the trained weights, so
+  `u250_accuracy_vs_throughput` pairs each build with the 5-seed sweep accuracy of its configuration.
+  Some stock builds (Base 224 `test_resnet_{6w6a,8w8a}`) came from earlier untrimmed checkpoints; the
+  trim is a host-side crop, so their hardware is the same as a trimmed build's.
 - All 240 sweep runs use the black-border trim at every input size. Slim reports do not record
   `student_preprocess`, but the slim scripts apply `trim_fundus_black_border` to all splits.
 - Intervals are nominal: seeds share one dataset and their test splits can overlap.

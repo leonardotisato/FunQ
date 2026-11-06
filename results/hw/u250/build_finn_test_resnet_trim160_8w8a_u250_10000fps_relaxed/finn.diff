@@ -1,0 +1,35 @@
+diff --git a/src/finn/transformation/fpgadataflow/create_stitched_ip.py b/src/finn/transformation/fpgadataflow/create_stitched_ip.py
+index 4212e2b5..298916a6 100644
+--- a/src/finn/transformation/fpgadataflow/create_stitched_ip.py
++++ b/src/finn/transformation/fpgadataflow/create_stitched_ip.py
+@@ -407,7 +407,7 @@ class CreateStitchedIP(Transformation):
+             assert num_workers >= 0, "Number of workers must be nonnegative."
+             if num_workers == 0:
+                 num_workers = mp.cpu_count()
+-            tcl.append("launch_runs synth_1 -jobs %s" % str(num_workers))
++            tcl.append("launch_runs synth_1 -jobs 1")
+             tcl.append("wait_on_run [get_runs synth_1]")
+             tcl.append("open_run synth_1 -name synth_1")
+             tcl.append("write_verilog -force -mode synth_stub %s.v" % block_name)
+diff --git a/src/finn/transformation/fpgadataflow/set_folding.py b/src/finn/transformation/fpgadataflow/set_folding.py
+index eaee499e..f515375e 100644
+--- a/src/finn/transformation/fpgadataflow/set_folding.py
++++ b/src/finn/transformation/fpgadataflow/set_folding.py
+@@ -184,6 +184,17 @@ class SetFolding(Transformation):
+                             swu_node_inst.set_nodeattr("parallel_window", 1)
+                         else:
+                             swu_node_inst.set_nodeattr("parallel_window", 0)
++                    # HPPS patch: the SWU inherits this node's PE but was never checked against
++                    # the target itself. A strided SWU reads the whole input map, so it can be
++                    # slower than the node it feeds. Raise PE (and the SWU SIMD with it) until the
++                    # SWU also meets the target, or PE reaches its maximum.
++                    if swu_node_inst.get_nodeattr("parallel_window") == 0:
++                        for val in divisors(max_pe):
++                            if swu_node_inst.get_exp_cycles() < self.target_cycles_per_frame:
++                                break
++                            if val > node_inst.get_nodeattr("PE"):
++                                node_inst.set_nodeattr("PE", val)
++                                swu_node_inst.set_nodeattr("SIMD", val)
+                 else:
+                     if op_type in ["VVAU_hls", "VVAU_rtl"]:
+                         ksize = np.prod(node_inst.get_nodeattr("Kernel"))

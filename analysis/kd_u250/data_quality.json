@@ -3,7 +3,7 @@
   "fp32_groups": 12,
   "missing_grid_cells": [],
   "legacy_qat_reports": 6,
-  "u250_builds": 17,
+  "u250_builds": 35,
   "missing_fp32_checkpoints": [
     "models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r18_ta_seed42_ft.pth",
     "models/kd_teacher_sweep_20260703_121750/test_resnet_slim128x64_fp32_kd_trim160_r18_ta_seed43_ft.pth",
@@ -369,6 +369,14 @@
       "sha256": "fde74809b4a104a41450dda58697fa7dd5b677c3c7e3c3a5309658a7d88c253e"
     },
     {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim160_6w6a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "ac5ee75067d27c16432d7e8512a5a5ea1f42d614d265f4679d4a9a130bf72655"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim160_6w6a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "c8456332b5ddd4b8c25e5466016a95c79aaa8da8be433ff960b84caa28d0b4a0"
+    },
+    {
       "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim160_6w6a_u250_1000fps/report/estimate_network_performance.json",
       "sha256": "bb2fc0fdec9794daa30be9b4702878306d745bcd4934e2d2b6a0a926e6f68abf"
     },
@@ -417,6 +425,14 @@
       "sha256": "b646608b4c56542a09606a645ad90feea29a18d5d48836936528f61a81f73c2a"
     },
     {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim160_8w8a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "ac5ee75067d27c16432d7e8512a5a5ea1f42d614d265f4679d4a9a130bf72655"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim160_8w8a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "c22f02000e8c0c71fdfc504daa868b143b557c01813cc143ed8959bb6eede6e8"
+    },
+    {
       "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim160_8w8a_u250_2000fps/report/estimate_network_performance.json",
       "sha256": "fef1a5df14b5f857e8dbf3ad074091f7bc6bcef5f5cbae1f51c6919f0e1f2ff7"
     },
@@ -433,6 +449,78 @@
       "sha256": "c22f02000e8c0c71fdfc504daa868b143b557c01813cc143ed8959bb6eede6e8"
     },
     {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_6w6a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "7ad4e3ffcddd480c3732386eef328210bc599aad7944c581b909e39409f7cb0f"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_6w6a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "d21e3cdf1f2f8f48e5209ddbcc2cb10c4820e2ea1d8a0ac85bdfc79317af9334"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_6w6a_u250_5000fps/report/estimate_network_performance.json",
+      "sha256": "097e8e4766a3f4128535436ff7be1a3ab625cba601c9596f4e4dbf11f6ddbf38"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_6w6a_u250_5000fps/driver/driver.py",
+      "sha256": "d21e3cdf1f2f8f48e5209ddbcc2cb10c4820e2ea1d8a0ac85bdfc79317af9334"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_8w8a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "7ad4e3ffcddd480c3732386eef328210bc599aad7944c581b909e39409f7cb0f"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_8w8a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "87510e772d832f03012ad945d0fbe0cccb5f831c48e7b5f7632f409e527676c2"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_8w8a_u250_5000fps/report/estimate_network_performance.json",
+      "sha256": "097e8e4766a3f4128535436ff7be1a3ab625cba601c9596f4e4dbf11f6ddbf38"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim192_8w8a_u250_5000fps/driver/driver.py",
+      "sha256": "87510e772d832f03012ad945d0fbe0cccb5f831c48e7b5f7632f409e527676c2"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_6w6a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "55d24470bfafbe9519eb7780c2ce910183f406435fa43e0a10b1403953fbf3fc"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_6w6a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "920ee70a9552414070913a254b19487a269fca01290d82b6f2421e3bd7207ee1"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_6w6a_u250_2000fps/report/estimate_network_performance.json",
+      "sha256": "08741e12421a01cfac14a59114bb44d261fcfd732f75a8484a7bdebd1543dfaa"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_6w6a_u250_2000fps/driver/driver.py",
+      "sha256": "920ee70a9552414070913a254b19487a269fca01290d82b6f2421e3bd7207ee1"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_8w8a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "55d24470bfafbe9519eb7780c2ce910183f406435fa43e0a10b1403953fbf3fc"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_8w8a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "950d529b085087e0b1e1167e1f9f10f940c5c7466d8ff3272958cf355e81fea2"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_8w8a_u250_2000fps/report/estimate_network_performance.json",
+      "sha256": "08741e12421a01cfac14a59114bb44d261fcfd732f75a8484a7bdebd1543dfaa"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_slim128x64_trim224_8w8a_u250_2000fps/driver/driver.py",
+      "sha256": "950d529b085087e0b1e1167e1f9f10f940c5c7466d8ff3272958cf355e81fea2"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "7e56f314f334287c2d3aa4f0fa327b25cc074f56ca8fccea8bce24ee5521a71d"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "8b180021522b6cf8dcd1c1ddec8adfa763df1b395839b3ff594f8875fc7861a9"
+    },
+    {
       "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_2000fps/report/estimate_network_performance.json",
       "sha256": "91f80359687c7d6ddfdd18ebaebdb0500eb4aaa6ca46c910f826bfcb8562659b"
     },
@@ -441,11 +529,11 @@
       "sha256": "8b180021522b6cf8dcd1c1ddec8adfa763df1b395839b3ff594f8875fc7861a9"
     },
     {
-      "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_5000fps/report/estimate_network_performance.json",
-      "sha256": "7287f8f7817c5a0c5a7d78e6124775dc11d6820d880d7e0777b23f2ebcc06dd0"
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_5300fps/report/estimate_network_performance.json",
+      "sha256": "7bffd9923a8d3e387a1c2a11540eefea6514da3a8eda14b01427129c21a69d90"
     },
     {
-      "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_5000fps/driver/driver.py",
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_5300fps/driver/driver.py",
       "sha256": "8b180021522b6cf8dcd1c1ddec8adfa763df1b395839b3ff594f8875fc7861a9"
     },
     {
@@ -455,6 +543,30 @@
     {
       "path": "results/hw/u250/build_finn_test_resnet_trim160_6w6a_u250_naive/driver/driver.py",
       "sha256": "5bc21d4e3aaf21a467839e541d99217f4691c4c3d93de28b020966b9ff328c69"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_8w8a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "7e56f314f334287c2d3aa4f0fa327b25cc074f56ca8fccea8bce24ee5521a71d"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_8w8a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "4a9ccd5bbe0a42ca42deada7e89d5f08df2cdcde62fecaa2d02ac99e63fa2198"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_8w8a_u250_5300fps/report/estimate_network_performance.json",
+      "sha256": "7bffd9923a8d3e387a1c2a11540eefea6514da3a8eda14b01427129c21a69d90"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim160_8w8a_u250_5300fps/driver/driver.py",
+      "sha256": "4a9ccd5bbe0a42ca42deada7e89d5f08df2cdcde62fecaa2d02ac99e63fa2198"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim192_6w6a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "d455f9ccb12c22608765a7cd45698964bd35fdb089a9622913e0b4e4b37be789"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim192_6w6a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "a074cef883c51a7f5a35b626a73fb142827bceb2db3c9a189c59c46e4dd9e8d4"
     },
     {
       "path": "results/hw/u250/build_finn_test_resnet_trim192_6w6a_u250_2000fps/report/estimate_network_performance.json",
@@ -471,6 +583,38 @@
     {
       "path": "results/hw/u250/build_finn_test_resnet_trim192_6w6a_u250_5000fps/driver/driver.py",
       "sha256": "a074cef883c51a7f5a35b626a73fb142827bceb2db3c9a189c59c46e4dd9e8d4"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim192_8w8a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "d455f9ccb12c22608765a7cd45698964bd35fdb089a9622913e0b4e4b37be789"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim192_8w8a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "b90882fef38eec5d0cbe394544ea768cdc53e3b33a7445fcc560802b6be09c6e"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim192_8w8a_u250_5000fps/report/estimate_network_performance.json",
+      "sha256": "1693e643c8c375df8771a08dffce43f98f68c480115ae68f05d265b0ffe83c2b"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim192_8w8a_u250_5000fps/driver/driver.py",
+      "sha256": "b90882fef38eec5d0cbe394544ea768cdc53e3b33a7445fcc560802b6be09c6e"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim224_6w6a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "0959d717e71ca74730aeea382678271975394f18c4e2923a8b45bff0190e3982"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim224_6w6a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "fa8c59bcd313626263674f26d507c95bc9cb4c3d09d1ed6d1446b9a3a8422ab3"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim224_8w8a_u250_10000fps_relaxed/report/estimate_network_performance.json",
+      "sha256": "0959d717e71ca74730aeea382678271975394f18c4e2923a8b45bff0190e3982"
+    },
+    {
+      "path": "results/hw/u250/build_finn_test_resnet_trim224_8w8a_u250_10000fps_relaxed/driver/driver.py",
+      "sha256": "fde74809b4a104a41450dda58697fa7dd5b677c3c7e3c3a5309658a7d88c253e"
     }
   ]
 }

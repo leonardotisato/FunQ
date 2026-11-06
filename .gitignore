@@ -17,10 +17,12 @@ __pycache__/
 multirun/
 outputs/
 
-Data/
+/Data/
 .*/
 build_*/
 board_*/
+# per-build summaries (reports, folding, driver) are tracked; bitfiles stay on the VM
+!results/hw/*/build_*/
 
 # archived experiment code, kept only on the training VM
 experiments-archive/

@@ -2,7 +2,7 @@
 
 ## Outputs
 
-Analyzed `results/fp32_kd_sweep` (sweep `kd_teacher_sweep_20260703_121750`): **60 FP32 runs**, covering two student architectures, input sizes 160/192/224, two teachers, and seeds 42–46. All 12 combinations contain all five seeds. Analyzed all **17 builds** in `results/hw/u250` (report summaries copied from `build/u250` on the training VM).
+Analyzed `results/fp32_kd_sweep` (sweep `kd_teacher_sweep_20260703_121750`): **60 FP32 runs**, covering two student architectures, input sizes 160/192/224, two teachers, and seeds 42–46. All 12 combinations contain all five seeds. Analyzed all **35 builds** in `results/hw/u250` (report summaries copied from `build/u250` on the training VM).
 
 Figures built from these tables are in `analysis/figures/` (`scripts/make_figures.py`).
 
@@ -12,7 +12,7 @@ Figures built from these tables are in `analysis/figures/` (`scripts/make_figure
 | `fp32_summary.csv` | 48 summaries: four metrics × 12 configurations; mean, sample SD, variance, standard error, 95% t interval, sample size and seeds |
 | `fp32_paired_teacher_differences.csv` | ResNet50-direct minus ResNet18-assistant differences, paired by seed within each architecture/resolution |
 | `reported_bootstrap_intervals.csv` | Original per-run test bootstrap summaries; retained separately from the across-run analysis |
-| `u250_estimates.csv` | 17 analytical FPS estimates, latency, bottleneck, inferred clock, driver shapes, target settings and source paths |
+| `u250_estimates.csv` | 35 analytical FPS estimates, latency, bottleneck, inferred clock, driver shapes, target settings and source paths |
 | `legacy_qat_runs.csv` | Six older single-run QAT reports outside the seed sweep; seed metadata is absent |
 | `data_quality.json` | Coverage checks, missing checkpoint paths, calculation conventions, and SHA-256 hashes of the source reports/drivers |
 
@@ -46,9 +46,9 @@ The slim student has 217,876 FP32 parameters versus 373,076 for TestResNet. In t
 
 ## U250 interpretation and future joins
 
-FPS comes directly from `results/hw/u250/<build>/report/estimate_network_performance.json` → `estimated_throughput_fps`. The `2000fps` and `5000fps` suffixes are requested targets, not measured or achieved throughput. This is the analytical performance-report type described in the [FINN documentation](https://finn-dev.readthedocs.io/en/stable/command_line.html#generated-outputs).
+FPS comes directly from `results/hw/u250/<build>/report/estimate_network_performance.json` → `estimated_throughput_fps`. Suffixes such as `2000fps`, `5000fps` or `10000fps_relaxed` are requested targets, not achieved throughput (`_relaxed`: FINN two-pass relaxation; `flow` in `results/hw/builds.csv` tells stock from minimum-area folding). This is the analytical performance-report type described in the [FINN documentation](https://finn-dev.readthedocs.io/en/stable/command_line.html#generated-outputs).
 
-All 17 estimates imply a 10 ns / 100 MHz clock, verified by reconciling latency and critical-path cycles, then checking `FPS = 1e9 / (clock_period_ns × max_cycles)`. All 17 builds have an `.xclbin` on the VM (listed with SHA-256 in `results/hw/builds.csv`); its presence does not establish board throughput, timing closure, or numerical correctness.
+All 35 estimates imply a 10 ns / 100 MHz clock, verified by reconciling latency and critical-path cycles, then checking `FPS = 1e9 / (clock_period_ns × max_cycles)`. All 35 builds have an `.xclbin` on the VM, listed in `results/hw/builds.csv` with SHA-256 and `vitis_max_mhz`, the frequency Vitis reports achievable after routing: every build with a value meets the 100 MHz kernel clock, so its FINN estimate is its on-board throughput. Numerical correctness on the board is not established by these files.
 
 Examples:
 

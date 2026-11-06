@@ -1,0 +1,7 @@
+{
+  "critical_path_cycles": 1331937,
+  "max_cycles": 45456,
+  "max_cycles_node_name": "ConvolutionInputGenerator_rtl_10",
+  "estimated_throughput_fps": 2199.929602252728,
+  "estimated_latency_ns": 13319370.0
+}

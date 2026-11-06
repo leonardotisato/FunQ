@@ -115,20 +115,26 @@ def paired_changes(runs):
 
 
 def load_builds():
+    """One row per U250 build; flow is "stock" FINN folding or "relaxed_swu_patch" (minimum area)."""
+    with (ROOT / "results/hw/builds.csv").open(encoding="utf-8") as handle:
+        listed = {row["build"]: row for row in csv.DictReader(handle) if row["board"] == "u250"}
     builds = []
     for directory in sorted((ROOT / "results/hw/u250").glob("build_finn_*")):
+        check(directory.name in listed, f"{directory.name} missing from results/hw/builds.csv")
         model, target = directory.name.removeprefix("build_finn_").split("_u250_")
         topology, bits = model.rsplit("_", 1)
         perf = json.loads((directory / "report/estimate_network_performance.json").read_text())
         res = json.loads((directory / "report/post_synth_resources.json").read_text())["(top)"]
         used = {"LUT": res["LUT"], "FF": res["FF"], "BRAM": res["BRAM_36K"] + res["BRAM_18K"] / 2, "DSP": res["DSP"]}
-        builds.append({"build": directory.name,
+        builds.append({"build": directory.name, "flow": listed[directory.name]["flow"],
                        "architecture": "test_resnet_slim128x64" if "slim128x64" in topology else "test_resnet",
                        "resolution": int(topology.rsplit("_trim", 1)[1]) if "_trim" in topology else 224,
-                       "precision": bits, "target": target, "throughput_fps": perf["estimated_throughput_fps"],
+                       "precision": bits, "target": target.removesuffix("_relaxed"),
+                       "throughput_fps": perf["estimated_throughput_fps"],
+                       "vitis_max_mhz": listed[directory.name]["vitis_max_mhz"],
                        **{f"{k}_used": v for k, v in used.items()},
                        **{f"{k}_pct": 100 * v / U250[k] for k, v in used.items()}})
-    check(len(builds) == 17, f"Expected 17 U250 builds, found {len(builds)}")
+    check(len(builds) == 35, f"Expected 35 U250 builds, found {len(builds)}")
     return builds
 
 
@@ -238,8 +244,10 @@ def fig_qat_precision(runs, out, metric, label, precisions, ylim, name):
 
 
 def max_throughput_builds(builds):
-    peaks = [b for b in builds if b["target"] == "5000fps"]
-    check(len(peaks) == 6, "Expected six 5000fps builds")
+    """Minimum-area builds: each configuration at its throughput limit (relaxed folding, FINN SWU patch)."""
+    peaks = [b for b in builds if b["flow"] == "relaxed_swu_patch"]
+    check(len(peaks) == 12, f"Expected 12 minimum-area builds, found {len(peaks)}")
+    check(all(float(b["vitis_max_mhz"]) >= 100 for b in peaks), "A minimum-area build missed 100 MHz")
     order = {("6w6a", "test_resnet"): 0, ("6w6a", "test_resnet_slim128x64"): 1,
              ("8w8a", "test_resnet"): 2, ("8w8a", "test_resnet_slim128x64"): 3}
     return sorted(peaks, key=lambda b: (order[(b["precision"], b["architecture"])], b["resolution"]))
@@ -294,9 +302,11 @@ def fig_u250_accuracy_vs_throughput(builds, runs, out):
 
 
 def fig_u250_slim_area(builds, out):
-    """Resource use of Slim 160 6-bit across throughput targets."""
+    """Resource use of Slim 160 6-bit across throughput targets (stock FINN folding)."""
     pts = sorted([b for b in builds if b["architecture"] == "test_resnet_slim128x64" and b["precision"] == "6w6a"
-                  and b["target"].endswith("fps")], key=lambda b: b["throughput_fps"])
+                  and b["resolution"] == 160 and b["flow"] == "stock" and b["target"].endswith("fps")],
+                 key=lambda b: b["throughput_fps"])
+    check(len(pts) == 6, f"Expected six stock Slim 160 6-bit builds, found {len(pts)}")
     styles = {"DSP": ("#e87ba4", "D", "-"), "LUT": ("#008300", "o", "-"),
               "BRAM": ("#6250d6", "s", "-"), "FF": ("#e34948", "^", "-")}
     fig, ax = plt.subplots(figsize=(COLUMN, 2.1))

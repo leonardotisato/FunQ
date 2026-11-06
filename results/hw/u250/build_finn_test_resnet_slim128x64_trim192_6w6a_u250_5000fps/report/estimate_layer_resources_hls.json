@@ -1,0 +1,194 @@
+{
+  "Pool_hls_0": {
+    "BRAM_18K": "0",
+    "FF": "444",
+    "LUT": "1104",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "DuplicateStreams_hls_0": {
+    "BRAM_18K": "0",
+    "FF": "19",
+    "LUT": "109",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_0": {
+    "BRAM_18K": "0",
+    "FF": "150",
+    "LUT": "401",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_1": {
+    "BRAM_18K": "0",
+    "FF": "158",
+    "LUT": "369",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "AddStreams_hls_0": {
+    "BRAM_18K": "0",
+    "FF": "19",
+    "LUT": "173",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "DuplicateStreams_hls_1": {
+    "BRAM_18K": "0",
+    "FF": "19",
+    "LUT": "109",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_2": {
+    "BRAM_18K": "0",
+    "FF": "114",
+    "LUT": "300",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "Pool_hls_1": {
+    "BRAM_18K": "0",
+    "FF": "112",
+    "LUT": "346",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_3": {
+    "BRAM_18K": "0",
+    "FF": "85",
+    "LUT": "306",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_4": {
+    "BRAM_18K": "0",
+    "FF": "89",
+    "LUT": "290",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "AddStreams_hls_1": {
+    "BRAM_18K": "0",
+    "FF": "18",
+    "LUT": "139",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "DuplicateStreams_hls_2": {
+    "BRAM_18K": "0",
+    "FF": "18",
+    "LUT": "107",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_5": {
+    "BRAM_18K": "0",
+    "FF": "85",
+    "LUT": "276",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "Pool_hls_2": {
+    "BRAM_18K": "0",
+    "FF": "83",
+    "LUT": "298",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_6": {
+    "BRAM_18K": "0",
+    "FF": "72",
+    "LUT": "284",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_7": {
+    "BRAM_18K": "0",
+    "FF": "74",
+    "LUT": "276",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "AddStreams_hls_2": {
+    "BRAM_18K": "0",
+    "FF": "19",
+    "LUT": "125",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "DuplicateStreams_hls_3": {
+    "BRAM_18K": "0",
+    "FF": "19",
+    "LUT": "109",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_8": {
+    "BRAM_18K": "0",
+    "FF": "72",
+    "LUT": "269",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "Pool_hls_3": {
+    "BRAM_18K": "0",
+    "FF": "70",
+    "LUT": "277",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_9": {
+    "BRAM_18K": "0",
+    "FF": "69",
+    "LUT": "276",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "ChannelwiseOp_hls_10": {
+    "BRAM_18K": "0",
+    "FF": "71",
+    "LUT": "268",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "AddStreams_hls_3": {
+    "BRAM_18K": "0",
+    "FF": "16",
+    "LUT": "119",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  },
+  "GlobalAccPool_hls_0": {
+    "BRAM_18K": "0",
+    "FF": "107",
+    "LUT": "442",
+    "DSP48E": 0,
+    "URAM": "0",
+    "DSP": "0"
+  }
+}
