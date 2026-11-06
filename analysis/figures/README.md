@@ -33,17 +33,20 @@ narrowed to 128 and 64 channels (218k parameters). "8-bit"/"6-bit"/"4-bit" means
 **`qat_precision_with_4bit_accuracy`** (also `_f1_weighted`)
 > As above, including 4-bit QAT; the y-axis starts at 50%.
 
-**`u250_max_throughput`**
-> Maximum throughput of each configuration on the Alveo U250 (FINN dataflow accelerator at 100 MHz;
-> all 12 builds meet timing, so these are the on-board rates). Throughput depends only on input size:
-> the first layer takes one input pixel per clock, so the limit is 100 MHz / (H+2)² = 3,810, 2,657 and
-> 1,958 FPS at 160, 192 and 224 px, for both architectures and bit-widths. Each build reaches this limit
-> with the least parallelism FINN finds for it (minimum-area builds, see notes).
-
 **`u250_accuracy_vs_throughput`**
-> Mean QAT test accuracy (TA teacher, 5 seeds) against the maximum U250 throughput of each
-> configuration (`u250_max_throughput`). Configurations with the same input size share one
-> throughput; architecture and bit-width change accuracy and area, not speed.
+> Mean QAT test accuracy (TA teacher, 5 seeds) against the maximum throughput of each configuration on
+> the Alveo U250 (FINN dataflow accelerator at 100 MHz; all 12 builds meet timing, so these are the
+> on-board rates). Throughput depends only on input size: the first layer takes one input pixel per
+> clock, so the limit is 100 MHz / (H+2)² = 3,810, 2,657 and 1,958 FPS at 160, 192 and 224 px, for both
+> architectures and bit-widths. Each build reaches this limit with the least parallelism FINN finds for
+> it (minimum-area builds, see notes). The y-axis spans 79–83.5%.
+
+**`u250_accuracy_vs_area`**
+> Mean QAT test accuracy against the LUT (left) and BRAM (right) use of the same minimum-area builds, as %
+> of the U250 (post-synthesis, including the platform shell). At equal throughput, bit-width sets most of
+> the area: 8-bit needs ~1.8 points more LUTs and 1.5–1.7× the BRAM of 6-bit, while Slim saves ~0.4 LUT points
+> and 12–19% BRAM over Base. DSPs are not shown: every Base build uses 2,817 and every Slim build 2,573,
+> at all input sizes.
 
 **`u250_slim160_6bit_area_vs_throughput`**
 > U250 resources (post-synthesis, % of the device) used by Slim, 160 px, 6-bit, built for

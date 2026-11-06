@@ -47,6 +47,7 @@ QAT_TEACHER = "r18_ta"
 RES_COLORS = {160: "#2a78d6", 192: "#eb6834", 224: "#1baf7a"}
 INK, INK_2, GRID = "#1a1a1a", "#555555", "#e2e2e2"
 HATCH = "//////"
+ACC_YLIM = (79, 83.5)  # QAT accuracy range of the 12 built configurations
 COLUMN, TEXT_WIDTH = 3.5, 7.16  # IEEEtran conference, inches
 
 # Xilinx Alveo U250 device totals.
@@ -253,52 +254,58 @@ def max_throughput_builds(builds):
     return sorted(peaks, key=lambda b: (order[(b["precision"], b["architecture"])], b["resolution"]))
 
 
-def fig_u250_throughput(builds, out):
-    """Maximum throughput reached by each configuration on the U250."""
-    peaks = max_throughput_builds(builds)
-    fig, ax = plt.subplots(figsize=(COLUMN, 2.0))
-    xs, ticks, gap = [], [], 0
-    for i, b in enumerate(peaks):
-        if i and b["precision"] != peaks[i - 1]["precision"]:
-            gap += 0.6
-        x = i + gap
-        xs.append(x)
-        bar(ax, x, {"mean": b["throughput_fps"]}, 0.7, b["resolution"], b["architecture"], interval=False, value=False)
-        ax.text(x, b["throughput_fps"] + 60, f"{b['throughput_fps']:,.0f}", ha="center", va="bottom", fontsize=6.5)
-    for precision in ("6w6a", "8w8a"):
-        group = [x for x, b in zip(xs, peaks) if b["precision"] == precision]
-        ticks.append((np.mean(group), PRECISION_NAMES[precision]))
-    ax.set_xticks([p for p, _ in ticks], [n for _, n in ticks])
-    ax.set_ylim(0, 4400)
-    finish_axes(ax, "Throughput (FPS)")
-    handles, labels = legend_handles()
-    ax.legend(handles, labels, ncol=5, loc="lower center", bbox_to_anchor=(0.5, 1.0), columnspacing=0.8)
-    save(fig, out, "u250_max_throughput")
+def accuracy_points(ax, builds, stats, x_key):
+    """One marker per minimum-area build at (x_key, mean QAT accuracy); returns the plotted rows."""
+    rows = []
+    for b in builds:
+        s = stats[(b["architecture"], b["resolution"], b["precision"])]["accuracy"]
+        color = RES_COLORS[b["resolution"]]
+        base = b["architecture"] == "test_resnet"
+        ax.scatter(b[x_key], s["mean"], marker=BIT_MARKERS[b["precision"]], s=34, zorder=3,
+                   facecolor=color if base else "white", edgecolor=color, linewidth=1.1)
+        rows.append({"build": b["build"], "architecture": b["architecture"], "resolution": b["resolution"],
+                     "precision": b["precision"], x_key: b[x_key], **s})
+    return rows
+
+
+def accuracy_axis(ax):
+    ax.set_ylim(*ACC_YLIM)
+    ax.set_yticks(range(math.ceil(ACC_YLIM[0]), math.floor(ACC_YLIM[1]) + 1))
+    ax.grid(color=GRID, linewidth=0.5, zorder=0)
 
 
 def fig_u250_accuracy_vs_throughput(builds, runs, out):
     """QAT accuracy (TA teacher, 5 seeds) against the maximum U250 throughput of the same configuration."""
     stats = summarize(runs, ("architecture", "resolution", "precision"))
     fig, ax = plt.subplots(figsize=(COLUMN, 2.3))
-    rows = []
-    for b in max_throughput_builds(builds):
-        s = stats[(b["architecture"], b["resolution"], b["precision"])]["accuracy"]
-        color = RES_COLORS[b["resolution"]]
-        base = b["architecture"] == "test_resnet"
-        ax.scatter(b["throughput_fps"], s["mean"], marker=BIT_MARKERS[b["precision"]], s=34, zorder=3,
-                   facecolor=color if base else "white", edgecolor=color, linewidth=1.1)
-        rows.append({"build": b["build"], "architecture": b["architecture"], "resolution": b["resolution"],
-                     "precision": b["precision"], "throughput_fps": b["throughput_fps"], **s})
+    rows = accuracy_points(ax, max_throughput_builds(builds), stats, "throughput_fps")
     ax.set_xlim(1500, 4200)
-    ax.set_ylim(76, 86)
-    ax.set_yticks(range(76, 87, 2))
+    accuracy_axis(ax)
     ax.set_xlabel("Throughput (FPS)")
     ax.set_ylabel("Test accuracy (%)")
-    ax.grid(color=GRID, linewidth=0.5, zorder=0)
     handles, labels = legend_handles(bits=True, markers=True)
     ax.legend(handles, labels, ncol=4, loc="lower center", bbox_to_anchor=(0.5, 1.0), columnspacing=0.9)
     save(fig, out, "u250_accuracy_vs_throughput")
     return rows
+
+
+def fig_u250_accuracy_vs_area(builds, runs, out):
+    """QAT accuracy against LUT and BRAM use of the minimum-area build of each configuration."""
+    stats = summarize(runs, ("architecture", "resolution", "precision"))
+    fig, axes = plt.subplots(1, 2, figsize=(COLUMN, 2.3), sharey=True, gridspec_kw={"wspace": 0.12})
+    rows = {}
+    for ax, resource, xlim in ((axes[0], "LUT", (13, 16.5)), (axes[1], "BRAM", (11, 27))):
+        for row in accuracy_points(ax, max_throughput_builds(builds), stats, f"{resource}_pct"):
+            rows.setdefault(row["build"], {}).update(row)
+        ax.set_xlim(*xlim)
+        accuracy_axis(ax)
+        ax.set_xlabel(f"{resource} (% of U250)")
+    axes[0].set_ylabel("Test accuracy (%)")
+    axes[1].tick_params(axis="y", length=0)
+    handles, labels = legend_handles(bits=True, markers=True)
+    fig.legend(handles, labels, ncol=4, loc="lower center", bbox_to_anchor=(0.5, 0.895), columnspacing=0.9)
+    save(fig, out, "u250_accuracy_vs_area")
+    return list(rows.values())
 
 
 def fig_u250_slim_area(builds, out):
@@ -341,8 +348,8 @@ def main():
         fig_fp32_teachers(runs, out, metric, label)
         fig_qat_precision(ta_runs, out, metric, label, PRECISIONS[:3], (70, 90), "qat_precision")
         fig_qat_precision(ta_runs, out, metric, label, PRECISIONS, (50, 100), "qat_precision_with_4bit")
-    fig_u250_throughput(builds, out)
     acc_fps = fig_u250_accuracy_vs_throughput(builds, ta_runs, out)
+    acc_area = fig_u250_accuracy_vs_area(builds, ta_runs, out)
     area = fig_u250_slim_area(builds, out)
 
     by = ("architecture", "resolution", "teacher", "precision")
@@ -353,6 +360,7 @@ def main():
     write_csv(out / "data/paired_change_vs_fp32.csv", paired)
     write_csv(out / "data/u250_builds.csv", builds)
     write_csv(out / "data/u250_accuracy_vs_throughput.csv", acc_fps)
+    write_csv(out / "data/u250_accuracy_vs_area.csv", acc_area)
     write_csv(out / "data/u250_slim160_6bit_area.csv", area)
     print(f"Wrote {out}")
 
