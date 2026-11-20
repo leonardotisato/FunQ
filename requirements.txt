@@ -43,3 +43,4 @@ qonnx
 # Development (Optional)
 # jupyter>=1.0.0
 # tensorboard>=2.13.0
+openpyxl>=3.1  # scripts/prepare_refuge.py reads the REFUGE label spreadsheets
