@@ -1,11 +1,7 @@
 """Helpers for building JSON-friendly experiment and evaluation reports."""
 
-CLASS_NAME_MAP = {
-    "healthy": "healthy",
-    "melanoma": "melanoma",
-    "nevus": "nevus",
-    "chrpe": "chrpe",
-}
+# Class names of the UWF lesion dataset, indexed by label.
+UWF_CLASS_NAMES = ("healthy", "nevus", "melanoma", "chrpe")
 
 
 def to_jsonable(value):
@@ -31,7 +27,7 @@ def _ci_triplet_to_pct(summary):
     }
 
 
-def format_bootstrap_metrics(raw_metrics):
+def format_bootstrap_metrics(raw_metrics, class_names=UWF_CLASS_NAMES):
     """Normalize bootstrap output into explicit percentage-based JSON sections."""
 
     metric_key_map = {
@@ -46,7 +42,10 @@ def format_bootstrap_metrics(raw_metrics):
         bootstrap_ci_pct[target_key] = _ci_triplet_to_pct(raw_metrics[raw_key])
 
     class_metrics = {}
-    for raw_name, class_name in CLASS_NAME_MAP.items():
+    for class_name in class_names:
+        if f"accuracy_{class_name}" not in raw_metrics:
+            continue  # class absent from the test labels
+        raw_name = class_name
         class_metrics[class_name] = {}
         for raw_key, target_key in metric_key_map.items():
             metric_key = target_key.replace("_overall", "").replace("_macro", "")
@@ -64,7 +63,8 @@ def format_bootstrap_metrics(raw_metrics):
     }
 
 
-def format_test_metrics(point_metrics_pct, raw_bootstrap_metrics=None):
+def format_test_metrics(point_metrics_pct, raw_bootstrap_metrics=None, class_names=None,
+                        binary_point=None, binary_bootstrap=None):
     """Build a clear evaluation report with explicit metric conventions.
 
     Returned sections use these conventions:
@@ -80,11 +80,19 @@ def format_test_metrics(point_metrics_pct, raw_bootstrap_metrics=None):
       - ``f1_macro``
     - ``class_one_vs_rest_bootstrap_ci_pct``:
       per-class one-vs-rest summaries for accuracy / precision / recall / f1
+    - binary tasks only (``binary_point`` / ``binary_bootstrap``, fractions in, percentages out):
+      ``binary_point_metrics_pct`` and ``binary_bootstrap_ci_pct`` with ``auc``,
+      ``balanced_accuracy``, ``sensitivity``, ``specificity``, ``sensitivity_at_specificity_<s>``
     """
 
     report = {
         "point_metrics_pct": to_jsonable(point_metrics_pct),
     }
     if raw_bootstrap_metrics is not None:
-        report.update(format_bootstrap_metrics(raw_bootstrap_metrics))
+        report.update(format_bootstrap_metrics(raw_bootstrap_metrics, class_names or UWF_CLASS_NAMES))
+    if binary_point is not None:
+        report["binary_point_metrics_pct"] = to_jsonable({k: v * 100.0 for k, v in binary_point.items()})
+    if binary_bootstrap is not None:
+        report["binary_bootstrap_ci_pct"] = to_jsonable(
+            {k: _ci_triplet_to_pct(v) for k, v in binary_bootstrap.items()})
     return report

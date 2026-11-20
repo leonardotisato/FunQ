@@ -68,6 +68,7 @@ def valid_metrics(report):
 def run_provenance(cfg, teacher_spec, init_checkpoint, train_df, val_df, test_df):
     source_report = cfg_select(cfg, "fp32_source_report", None)
     data_csv = Path(cfg.data_dir) / cfg.csv_file
+    official = "split" in train_df.columns  # official train/val/test column, see prepare_dataframes
     split_manifest = {}
     for name, frame in (("train", train_df), ("validation", val_df), ("test", test_df)):
         columns = [c for c in ("patient_id", "image", "label") if c in frame.columns]
@@ -84,10 +85,12 @@ def run_provenance(cfg, teacher_spec, init_checkpoint, train_df, val_df, test_df
             "random_seed": int(cfg.RANDOM_SEED), "split_seed": int(cfg.RANDOM_SEED),
             "qat_seed": int(cfg.RANDOM_SEED),
             "fp32_seed": int(cfg.RANDOM_SEED) if source_report else None,
-            "seed_protocol": "RANDOM_SEED controls patient split and QAT randomness",
+            "seed_protocol": ("RANDOM_SEED controls QAT randomness; the split is the dataset's official one"
+                              if official else "RANDOM_SEED controls patient split and QAT randomness"),
             "fp32_source_report": source_report,
             "fp32_source_report_sha256": file_sha256(source_report) if source_report else None,
             "data_csv": str(data_csv), "data_csv_sha256": file_sha256(data_csv),
+            "dataset": cfg_select(cfg, "dataset_name", "uwf"),
             "patient_splits": split_manifest,
-            "patient_split_fractions": {"train": 0.70, "validation": 0.15, "test": 0.15},
+            "patient_split_fractions": None if official else {"train": 0.70, "validation": 0.15, "test": 0.15},
             "sweep_run_fingerprint": cfg_select(cfg, "sweep_run_fingerprint", None)}

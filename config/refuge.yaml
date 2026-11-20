@@ -1,0 +1,21 @@
+# REFUGE (glaucoma vs non-glaucoma, colour fundus photographs), the second dataset.
+# Run any training script with --config-name refuge; every other setting comes from config.yaml.
+# The CSV has a split column (official train/val/test), so the seed does not change the split.
+defaults:
+  - config
+  - _self_
+
+dataset_name: refuge
+data_dir: Data/refuge
+csv_file: refuge.csv
+
+nr_classes: 2
+class_names: [non_glaucoma, glaucoma]
+
+# Keep REFUGE teachers, students and results apart from the UWF ones.
+models_dir: models/refuge
+teacher_models_dir: models/refuge
+results_dir: runs/refuge
+
+# The teacher assistant distils this supervised ResNet50 (src/train_resnet50_teacher.py).
+ta_teacher_checkpoint: resnet50_fp32.pth

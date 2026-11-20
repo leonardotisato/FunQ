@@ -16,8 +16,12 @@ results_dir: runs
 models_dir: models
 logs_dir: logs
 
-# Classes
+# Dataset (UWF pigmented lesions); config/refuge.yaml selects the second dataset
+dataset_name: uwf
+
+# Classes, indexed by label
 nr_classes: 4
+class_names: [healthy, nevus, melanoma, chrpe]
 
 # Training parameters
 RANDOM_SEED: 42

@@ -11,7 +11,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.nn.utils import clip_grad_norm_
 from .metrics import bootstrap_metrics, GradCAM, save_gradcam, get_last_conv_layer
-from .reporting import format_test_metrics
+from .binary_metrics import binary_point_metrics, bootstrap_binary_metrics
+from .reporting import UWF_CLASS_NAMES, format_test_metrics
 import numpy as np
 from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score, confusion_matrix
 from tqdm import tqdm
@@ -23,7 +24,8 @@ matplotlib.use("Agg")
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def train(model, train_loader, valid_loader, epochs, learning_rate, weight_decay, device, exp_name, model_type, grad_clip_value=5.0):
+def train(model, train_loader, valid_loader, epochs, learning_rate, weight_decay, device, exp_name, model_type, grad_clip_value=5.0,
+          log_dir='./results'):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay = weight_decay)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
@@ -42,7 +44,8 @@ def train(model, train_loader, valid_loader, epochs, learning_rate, weight_decay
 
     if not os.path.isdir('./results'):
         os.mkdir('./results')
-    logname = (f'./results/{model_type}_' + exp_name + '.csv')
+    os.makedirs(log_dir, exist_ok=True)
+    logname = os.path.join(log_dir, f'{model_type}_{exp_name}.csv')
     if not os.path.exists(logname):
         with open(logname, 'w') as logfile:
             logwriter = csv.writer(logfile, delimiter=',')
@@ -73,9 +76,6 @@ def train(model, train_loader, valid_loader, epochs, learning_rate, weight_decay
             inputs, labels = inputs.to(device), labels.to(device)
 
             # --- debug prints --- #
-            # print image names in the current batch
-            batch_image_names = train_loader.dataset.data_csv.iloc[:len(inputs)]['patient'].tolist()
-            #print("Batch image names:", batch_image_names)
             #print(f"input shape: {inputs.shape}, labels shape: {labels.shape}, min values: {inputs.min()}, max values: {inputs.max()}")
 
             optimizer.zero_grad()
@@ -161,7 +161,7 @@ def train(model, train_loader, valid_loader, epochs, learning_rate, weight_decay
             if avg_val_loss < best_val_loss:
                 best_epoch = epoch
                 best_val_loss = avg_val_loss
-                best_model_state = model.state_dict()
+                best_model_state = copy.deepcopy(model.state_dict())  # a copy: state_dict() aliases the live weights
                 counter = 0
                 best_f1 = val_f1
                 best_accuracy = val_acc
@@ -213,7 +213,13 @@ def _select_eval_inputs(batch, model_type):
         f"Paired batches require a teacher/student-compatible model_type. Received model_type='{model_type}'."
     )
 
-def test(model, test_loader, device, model_type, bootstrap=False, savedir = None, n_bootstrap=10000):
+def test(model, test_loader, device, model_type, bootstrap=False, savedir = None, n_bootstrap=10000,
+         class_names=None):
+    """Evaluate on the test set. ``class_names[i]`` names label ``i`` (default: UWF lesion classes).
+
+    Two-class models also get AUC, balanced accuracy, sensitivity, specificity and sensitivity at
+    85% specificity, from the predicted probability of class 1.
+    """
     model.to(device)
     model.eval()
 
@@ -343,20 +349,36 @@ def test(model, test_loader, device, model_type, bootstrap=False, savedir = None
 
 
     print(f"Test Accuracy: {accuracy:.2f}% | F1: {f1:.4f} | Precision: {precision:.4f} | Recall: {recall:.4f}")
+    n_classes = np.asarray(all_probs).shape[1]
+    if class_names is None:
+        class_names = UWF_CLASS_NAMES if n_classes == 4 else tuple(f"class_{i}" for i in range(n_classes))
+    binary_point = binary_bootstrap = None
+    if n_classes == 2:
+        positive_scores = np.asarray(all_probs)[:, 1]
+        binary_point = binary_point_metrics(all_labels, positive_scores, all_preds)
+        print(f"Test AUC: {100 * binary_point['auc']:.2f}% | balanced accuracy: "
+              f"{100 * binary_point['balanced_accuracy']:.2f}%")
+        if bootstrap:
+            # Seeded from NumPy's global generator, like the class-wise bootstrap below.
+            rng = np.random.default_rng(np.random.randint(0, 2**31 - 1))
+            binary_bootstrap = bootstrap_binary_metrics(all_labels, positive_scores, all_preds,
+                                                        n_bootstrap=n_bootstrap, rng=rng)
+    raw_bootstrap_metrics = None
     if bootstrap:
         raw_bootstrap_metrics = bootstrap_metrics(
             all_preds=all_preds,
             all_labels=all_labels,
             n_bootstrap=n_bootstrap,
-            confidence_level=0.95
+            confidence_level=0.95,
+            class_names=class_names,
         )
-        metrics = format_test_metrics(
-            point_metrics_pct=point_metrics_pct,
-            raw_bootstrap_metrics=raw_bootstrap_metrics,
-        )
-    else:
-        metrics = format_test_metrics(point_metrics_pct=point_metrics_pct)
-    return metrics
+    return format_test_metrics(
+        point_metrics_pct=point_metrics_pct,
+        raw_bootstrap_metrics=raw_bootstrap_metrics,
+        class_names=class_names,
+        binary_point=binary_point,
+        binary_bootstrap=binary_bootstrap,
+    )
 
 
 def train_knowledge_distillation(
@@ -373,6 +395,7 @@ def train_knowledge_distillation(
     ce_loss_weight,
     device,
     exp_name,
+    log_dir='./results',
 ):
     optimizer = optim.Adam(student.parameters(), lr=learning_rate, weight_decay=weight_decay)
     hard_loss = nn.CrossEntropyLoss()
@@ -401,7 +424,8 @@ def train_knowledge_distillation(
     if not os.path.isdir('./results'):
         os.mkdir('./results')
 
-    logname = f'./results/Distillation_{exp_name}.csv'
+    os.makedirs(log_dir, exist_ok=True)
+    logname = os.path.join(log_dir, f'Distillation_{exp_name}.csv')
 
     if not os.path.exists(logname):
         with open(logname, 'w') as logfile:
@@ -543,7 +567,7 @@ def train_knowledge_distillation(
         if epoch > 10:  # min epochs before early stopping
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
-                best_student_model = student.state_dict()
+                best_student_model = copy.deepcopy(student.state_dict())  # a copy: state_dict() aliases the live weights
                 best_f1 = f1
                 best_accuracy = val_accuracy
                 best_precision = precision

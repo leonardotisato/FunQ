@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 from sklearn.utils import resample
+from .reporting import UWF_CLASS_NAMES
 import torch
 import torch.nn as nn
 import numpy as np
@@ -11,7 +12,12 @@ import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 
-def bootstrap_metrics(all_preds, all_labels, n_bootstrap=1000, confidence_level=0.95):
+def bootstrap_metrics(all_preds, all_labels, n_bootstrap=1000, confidence_level=0.95, class_names=None):
+    """Bootstrap overall (macro) and per-class one-vs-rest metrics.
+
+    ``class_names[i]`` names label ``i`` in the returned keys; defaults to the UWF lesion classes.
+    """
+    class_names = tuple(class_names) if class_names is not None else UWF_CLASS_NAMES
     # Initialize lists to store metric results
     accuracies = []
     precisions = []
@@ -80,32 +86,20 @@ def bootstrap_metrics(all_preds, all_labels, n_bootstrap=1000, confidence_level=
         print('----------------------------------------------------------------')
 
 
-    return {
+    summary = {
         'accuracy': (np.mean(accuracies), lower_acc, upper_acc),
         'precision': (np.mean(precisions), lower_prec, upper_prec),
         'recall': (np.mean(recalls), lower_rec, upper_rec),
         'f1_score': (np.mean(f1_scores), lower_f1, upper_f1),
-        # Class-wise metrics
-        'accuracy_healthy': class_wise_ci[0]['accuracy'],
-        'precision_healthy': class_wise_ci[0]['precision'],
-        'recall_healthy': class_wise_ci[0]['recall'],
-        'f1_score_healthy': class_wise_ci[0]['f1'],
-        
-        'accuracy_melanoma': class_wise_ci[2]['accuracy'],
-        'precision_melanoma': class_wise_ci[2]['precision'],
-        'recall_melanoma': class_wise_ci[2]['recall'],
-        'f1_score_melanoma': class_wise_ci[2]['f1'],
-        
-        'accuracy_nevus': class_wise_ci[1]['accuracy'],
-        'precision_nevus': class_wise_ci[1]['precision'],
-        'recall_nevus': class_wise_ci[1]['recall'],
-        'f1_score_nevus': class_wise_ci[1]['f1'],
-        
-        'accuracy_chrpe': class_wise_ci[3]['accuracy'],
-        'precision_chrpe': class_wise_ci[3]['precision'],
-        'recall_chrpe': class_wise_ci[3]['recall'],
-        'f1_score_chrpe': class_wise_ci[3]['f1'],
     }
+    # Class-wise metrics, named by label index
+    for cls, ci in class_wise_ci.items():
+        name = class_names[int(cls)]
+        summary[f'accuracy_{name}'] = ci['accuracy']
+        summary[f'precision_{name}'] = ci['precision']
+        summary[f'recall_{name}'] = ci['recall']
+        summary[f'f1_score_{name}'] = ci['f1']
+    return summary
 
 
 # -------------------------------------------------------------------------

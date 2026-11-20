@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore")
 import hydra
 import numpy as np
 import torch
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -121,7 +121,9 @@ def main(cfg: DictConfig) -> None:
         pin_memory=True,
     )
 
-    teacher_path = os.path.join(cfg.models_dir, TEACHER_CHECKPOINT)
+    # UWF: the ResNet50 distilled from the lesion-centred model; REFUGE: a supervised ResNet50.
+    teacher_checkpoint = OmegaConf.select(cfg, "ta_teacher_checkpoint", default=TEACHER_CHECKPOINT)
+    teacher_path = os.path.join(cfg.models_dir, teacher_checkpoint)
     if not os.path.exists(teacher_path):
         print(f"[ERROR] Teacher checkpoint not found: {teacher_path}")
         return
@@ -166,6 +168,7 @@ def main(cfg: DictConfig) -> None:
         ce_loss_weight=CE_LOSS_WEIGHT,
         device=device,
         exp_name=exp_name,
+        log_dir=cfg.results_dir,
     )
 
     save_metrics_and_plot(
@@ -202,6 +205,7 @@ def main(cfg: DictConfig) -> None:
         model_type="resnet18_from_resnet50_kd",
         bootstrap=True,
         savedir=cfg.results_dir,
+        class_names=OmegaConf.select(cfg, "class_names", default=None),
     )
     print(f"Test metrics: {test_metrics}")
 
@@ -210,7 +214,9 @@ def main(cfg: DictConfig) -> None:
         json.dump(convert_dict(test_metrics), fp)
 
     report = {
-        "teacher_checkpoint": TEACHER_CHECKPOINT,
+        "dataset": OmegaConf.select(cfg, "dataset_name", default="uwf"),
+        "random_seed": int(cfg.RANDOM_SEED),
+        "teacher_checkpoint": teacher_checkpoint,
         "student_checkpoint": STUDENT_CHECKPOINT,
         "soft_target_loss_weight": SOFT_TARGET_LOSS_WEIGHT,
         "ce_loss_weight": CE_LOSS_WEIGHT,

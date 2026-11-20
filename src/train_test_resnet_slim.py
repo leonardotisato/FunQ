@@ -273,6 +273,7 @@ def main(cfg: DictConfig) -> None:
         model_type=run_cfg["model_type"],
         bootstrap=True,
         savedir=results_dir,
+        class_names=OmegaConf.select(cfg, "class_names", default=None),
     )
     print(f"Test metrics: {test_metrics}")
 
@@ -293,6 +294,7 @@ def main(cfg: DictConfig) -> None:
         "teacher_arch": teacher_spec["arch"],
         "teacher_checkpoint": teacher_path,
         "teacher": f"{teacher_spec['checkpoint_name']} (512x512 full-image strong train / test eval)",
+        "dataset": OmegaConf.select(cfg, "dataset_name", default="uwf"),
         "experiment_tag": paths.experiment_tag,
         "random_seed": int(cfg.RANDOM_SEED),
         "student_resolution": student_resolution,

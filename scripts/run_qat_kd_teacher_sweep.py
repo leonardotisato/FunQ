@@ -48,7 +48,10 @@ def validate_trainer_protocol(root=ROOT):
 
 def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=None,
               teachers=None, resolutions=None, experiment_tag=None, fp32_models_dir=None,
-              teacher_models_dir=None, batch_size=16, data_dir=None, csv_file="fundus_data_final.csv"):
+              teacher_models_dir=None, batch_size=16, data_dir=None, csv_file="fundus_data_final.csv",
+              config_name="config", output_subdir=""):
+    """``config_name`` selects the Hydra config (``refuge`` for the second dataset); models, results and
+    logs go under ``models/<output_subdir>``, ``runs/<output_subdir>`` and ``logs/<output_subdir>``."""
     root, source = Path(root).resolve(), Path(source_sweep).resolve()
     validate_trainer_protocol(ROOT)
     experiment = experiment_tag or f"qat_{source.name}"
@@ -79,6 +82,8 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
                   "src/utils/metrics.py", "src/utils/transforms.py", "src/utils/seed.py",
                   "src/utils/model.py", "src/utils/quant_test_resnet.py", "src/utils/quant_test_resnet_slim.py",
                   "config/config.yaml", "scripts/run_qat_kd_teacher_sweep.py"]
+    if config_name != "config":
+        code_files.append(f"config/{config_name}.yaml")
     code_hashes = {name: fingerprint(ROOT / name) for name in code_files}
     runs, seen = [], set()
     for path in sorted(source.glob("*/*_report.json")):
@@ -116,8 +121,8 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
                     ("test_resnet_slim128x64", 160, 6), ("test_resnet_slim128x64", 160, 8)}:
                 continue
             names = resolve_qat_run(arch, resolution, bit, bit, teacher, seed, experiment)
-            results_dir = root / "runs" / experiment / names["results_dir_name"]
-            output_checkpoint = root / "models" / experiment / names["checkpoint_name"]
+            results_dir = root / "runs" / output_subdir / experiment / names["results_dir_name"]
+            output_checkpoint = root / "models" / output_subdir / experiment / names["checkpoint_name"]
             if output_checkpoint == fp32_path:
                 raise ValueError("QAT output must not replace the FP32 checkpoint")
             run = {"run_id": names["run_tag"], "architecture": arch, "resolution": resolution,
@@ -126,23 +131,25 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
                    "teacher_checkpoint": str(teacher_path), "data_csv": str(data_csv),
                    "source_sha256": fingerprint(path), "fp32_sha256": fingerprint(fp32_path),
                    "teacher_sha256": fingerprint(teacher_path), "data_sha256": fingerprint(data_csv),
-                   "code_sha256": code_hashes, "batch_size": batch_size,
+                   "code_sha256": code_hashes, "batch_size": batch_size, "config_name": config_name,
                    "output_checkpoint": str(output_checkpoint),
                    "output_report": str(results_dir / names["report_name"]),
                    "run_manifest": str(results_dir / "run_manifest.json"),
-                   "log_file": str(root / "logs" / experiment / f"{names['run_tag']}.log")}
+                   "log_file": str(root / "logs" / output_subdir / experiment / f"{names['run_tag']}.log")}
             run["fingerprint"] = hashlib.sha256(json.dumps(run, sort_keys=True).encode()).hexdigest()
             overrides = {"RANDOM_SEED": seed, "student_resolution": resolution,
                          "teacher_mode": teacher, "teacher_checkpoint": str(teacher_path),
                          "experiment_tag": experiment, "warm_start_checkpoint": str(fp32_path),
                          "fp32_source_report": str(path), "sweep_run_fingerprint": run["fingerprint"],
                          "weight_bits": bit, "act_bits": bit, "batch_size": batch_size,
-                         "models_dir": str(root / "models"), "results_dir": str(root / "runs"),
+                         "models_dir": str(root / "models" / output_subdir),
+                         "results_dir": str(root / "runs" / output_subdir),
                          "data_dir": str(data_csv.parent), "csv_file": data_csv.name}
             if layer3:
                 overrides.update(slim_layer3_out=int(layer3), slim_layer4_out=int(layer4))
             script = root / "src" / ("qat_test_resnet_slim.py" if layer3 else "qat_test_resnet_trim.py")
-            run["command"] = [sys.executable, "-u", str(script)] + [
+            config_args = ["--config-name", config_name] if config_name != "config" else []
+            run["command"] = [sys.executable, "-u", str(script)] + config_args + [
                 f"++{key}={json.dumps(value)}" for key, value in overrides.items()]
             runs.append(run)
     if not runs:
@@ -258,6 +265,8 @@ def main():
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--data-dir", type=Path)
     parser.add_argument("--csv-file", default="fundus_data_final.csv")
+    parser.add_argument("--config-name", default="config", help="Hydra config, e.g. refuge for the second dataset")
+    parser.add_argument("--output-subdir", default="", help="Write under models/<subdir>, runs/<subdir>, logs/<subdir>")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="Print commands; no checkpoints or training packages required")
     mode.add_argument("--check", action="store_true", help="Validate every selected input/output without starting training")

@@ -338,6 +338,22 @@ def _can_stratify(patients_df, label_col="label"):
     return (counts.min() >= 2) and (len(counts) >= 2)
 
 
+def _official_split(full_df, patient_col="patient_id"):
+    """Use the dataset's own train/val/test assignment (a ``split`` column); the seed does not change it."""
+    unknown = set(full_df["split"]) - {"train", "val", "test"}
+    if unknown:
+        raise ValueError(f"Unknown values in the split column: {sorted(unknown)}")
+    if patient_col not in full_df.columns:
+        # One row per image and no patient identifier: each image is its own group.
+        full_df = full_df.assign(**{patient_col: full_df["image"].astype(str)})
+    frames = [full_df[full_df["split"] == name].reset_index(drop=True) for name in ("train", "val", "test")]
+    if any(frame.empty for frame in frames):
+        raise ValueError("The split column must contain train, val and test rows")
+    groups = [set(frame[patient_col]) for frame in frames]
+    assert groups[0].isdisjoint(groups[1]) and groups[0].isdisjoint(groups[2]) and groups[1].isdisjoint(groups[2])
+    return tuple(frames)
+
+
 def prepare_dataframes(
     cfg,
     patient_col: str = "patient_id",
@@ -347,6 +363,9 @@ def prepare_dataframes(
 ):
     data_csv = os.path.join(cfg.data_dir, cfg.csv_file)
     full_df = pd.read_csv(data_csv)
+
+    if "split" in full_df.columns:
+        return _official_split(full_df, patient_col)
 
     if patient_col not in full_df.columns:
         full_df[patient_col] = (

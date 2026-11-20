@@ -289,6 +289,7 @@ def main(cfg: DictConfig) -> None:
         model_type=run_cfg["model_type"],
         bootstrap=True,
         savedir=results_dir,
+        class_names=OmegaConf.select(cfg, "class_names", default=None),
     )
     print(f"QAT test metrics: {test_metrics}")
 
