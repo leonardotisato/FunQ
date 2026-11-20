@@ -5,7 +5,7 @@ import warnings
 import torch
 from torch.utils.data import DataLoader
 import hydra
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 warnings.filterwarnings("ignore")
 from utils.seed import set_seeds
 from utils.visualization import save_metrics_and_plot 
@@ -65,6 +65,8 @@ def main(cfg: DictConfig):
     # ------------------ DATASET & DATALOADER ------------------
 
     train_df, val_df, test_df = prepare_dataframes(cfg)
+    # UWF: only lesions have masks. REFUGE: every image is cropped around its optic disc.
+    roi_all_classes = bool(OmegaConf.select(cfg, "roi_mask_all_classes", default=False))
 
     train_transform = train_transform_class
     val_transform   = test_transform_class
@@ -75,7 +77,8 @@ def main(cfg: DictConfig):
         transform=train_transform,
         dilation_percentage = cfg.dilation_percentage,
         is_training = True,
-        random_seed = cfg.RANDOM_SEED
+        random_seed = cfg.RANDOM_SEED,
+        roi_all_classes = roi_all_classes
     )
 
     val_dataset_teacher = FundusClsDatasetZoom(
@@ -83,7 +86,8 @@ def main(cfg: DictConfig):
         transform=val_transform,
         dilation_percentage = cfg.dilation_percentage,
         is_training = False,
-        random_seed = cfg.RANDOM_SEED
+        random_seed = cfg.RANDOM_SEED,
+        roi_all_classes = roi_all_classes
     )
 
     test_dataset_teacher = FundusClsDatasetZoom(
@@ -91,7 +95,8 @@ def main(cfg: DictConfig):
         transform=test_transform,
         dilation_percentage = cfg.dilation_percentage,
         is_training = False,
-        random_seed = cfg.RANDOM_SEED
+        random_seed = cfg.RANDOM_SEED,
+        roi_all_classes = roi_all_classes
     )
 
     train_dataset_kd = PairedFundusDataset(
@@ -101,6 +106,7 @@ def main(cfg: DictConfig):
         dilation_percentage=cfg.dilation_percentage, 
         student_train=True,
         teacher_train=True,
+        roi_all_classes=roi_all_classes,
     )
 
     val_dataset_kd = PairedFundusDataset(
@@ -110,6 +116,7 @@ def main(cfg: DictConfig):
         dilation_percentage=cfg.dilation_percentage,
         student_train=False,
         teacher_train=False,
+        roi_all_classes=roi_all_classes,
     )
 
     test_dataset_kd = PairedFundusDataset(
@@ -119,6 +126,7 @@ def main(cfg: DictConfig):
         dilation_percentage=cfg.dilation_percentage,
         student_train=False,
         teacher_train=False,
+        roi_all_classes=roi_all_classes,
     )
     train_loader_teacher = DataLoader(
         train_dataset_teacher,
@@ -193,6 +201,7 @@ def main(cfg: DictConfig):
         weight_decay=cfg.weight_decay,
         device=device,
         exp_name=exp_name,
+        log_dir=cfg.results_dir,
         model_type="teacher",
         grad_clip_value=5.0,
     )
@@ -219,7 +228,8 @@ def main(cfg: DictConfig):
         soft_target_loss_weight=cfg.soft_w,
         ce_loss_weight=cfg.ce_w,
         device=device,
-        exp_name=exp_name
+        exp_name=exp_name,
+        log_dir=cfg.results_dir,
     )
 
     save_metrics_and_plot(
@@ -276,7 +286,8 @@ def main(cfg: DictConfig):
         device=device,
         model_type="teacher",
         bootstrap = True,
-        savedir=cfg.results_dir
+        savedir=cfg.results_dir,
+        class_names=OmegaConf.select(cfg, "class_names", default=None),
     )
     print("\n---- Student with KD ----")
     metrics_kd = test(
@@ -285,7 +296,8 @@ def main(cfg: DictConfig):
         device=device,
         model_type="student_kd",
         bootstrap = True,
-        savedir=cfg.results_dir
+        savedir=cfg.results_dir,
+        class_names=OmegaConf.select(cfg, "class_names", default=None),
     )
     print("\n================ TESTING COMPLETED =================")
     # save test summaries in JSON

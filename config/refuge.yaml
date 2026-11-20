@@ -17,5 +17,6 @@ models_dir: models/refuge
 teacher_models_dir: models/refuge
 results_dir: runs/refuge
 
-# The teacher assistant distils this supervised ResNet50 (src/train_resnet50_teacher.py).
-ta_teacher_checkpoint: resnet50_fp32.pth
+# Teacher chain as on UWF (src/main.py): ResNet50 on region-of-interest crops, distilled into a
+# full-image ResNet50. Every REFUGE image has an optic-disc mask, so both classes are cropped around it.
+roi_mask_all_classes: true

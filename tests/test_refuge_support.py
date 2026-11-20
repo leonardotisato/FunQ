@@ -137,6 +137,41 @@ class SplitSeedTests(unittest.TestCase):
             self.assertNotEqual(self._test_patients(tmp, RANDOM_SEED=42), self._test_patients(tmp, RANDOM_SEED=43))
 
 
+class RoiCropTests(unittest.TestCase):
+    """With roi_all_classes, label-0 images are cropped around their mask too (e.g. the optic disc)."""
+
+    def _row(self, tmp, label):
+        import cv2
+
+        image = np.full((200, 300, 3), 90, np.uint8)
+        mask = np.zeros((200, 300), np.uint8)
+        mask[20:60, 30:90] = 255  # region of interest far from the image centre
+        # The crop slices [min:max] over the mask's pixel coordinates, so it is one pixel short.
+        cv2.imwrite(os.path.join(tmp, "img.png"), image)
+        cv2.imwrite(os.path.join(tmp, "mask.png"), mask)
+        return pd.DataFrame([{"image": os.path.join(tmp, "img.png"), "mask": os.path.join(tmp, "mask.png"),
+                              "label": label}])
+
+    def _crop_shape(self, frame, roi_all_classes):
+        from utils.dataset import BaseLesionZoomDataset
+
+        ds = BaseLesionZoomDataset(frame, dilation_percentage=0.0, roi_all_classes=roi_all_classes)
+        image, mask, mask_original, _ = ds._load_image_and_mask(0)
+        return ds._crop_around_lesion(image, mask, mask_original)[0].shape[:2]
+
+    def test_label_zero_uses_its_mask_only_with_the_flag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            frame = self._row(tmp, label=0)
+            self.assertEqual(self._crop_shape(frame, roi_all_classes=True), (39, 59))
+            self.assertNotEqual(self._crop_shape(frame, roi_all_classes=False), (39, 59))  # UWF: centre zoom
+
+    def test_positive_label_is_unchanged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            frame = self._row(tmp, label=1)
+            self.assertEqual(self._crop_shape(frame, roi_all_classes=False), (39, 59))
+            self.assertEqual(self._crop_shape(frame, roi_all_classes=True), (39, 59))
+
+
 class ConfigTests(unittest.TestCase):
     def test_uwf_default_and_refuge_config(self):
         from hydra import compose, initialize_config_dir
@@ -152,6 +187,8 @@ class ConfigTests(unittest.TestCase):
         for key in ("models_dir", "teacher_models_dir", "results_dir"):
             self.assertIn("refuge", str(refuge[key]))
         self.assertEqual(refuge.n_epochs, uwf.n_epochs)  # everything else is inherited
+        self.assertTrue(refuge.roi_mask_all_classes)
+        self.assertFalse(uwf.get("roi_mask_all_classes", False))
 
 
 class _Cfg(dict):

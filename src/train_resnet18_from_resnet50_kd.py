@@ -121,7 +121,7 @@ def main(cfg: DictConfig) -> None:
         pin_memory=True,
     )
 
-    # UWF: the ResNet50 distilled from the lesion-centred model; REFUGE: a supervised ResNet50.
+    # The full-image ResNet50 distilled from the region-of-interest model (main.py).
     teacher_checkpoint = OmegaConf.select(cfg, "ta_teacher_checkpoint", default=TEACHER_CHECKPOINT)
     teacher_path = os.path.join(cfg.models_dir, teacher_checkpoint)
     if not os.path.exists(teacher_path):

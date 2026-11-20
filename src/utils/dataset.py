@@ -133,7 +133,11 @@ class FundusClsDataset(Dataset):
 
 
 class BaseLesionZoomDataset(Dataset):
-    def __init__(self, csv_file, transform=None, dilation_percentage=0.5, is_training=True, random_seed=42):
+    def __init__(self, csv_file, transform=None, dilation_percentage=0.5, is_training=True, random_seed=42,
+                 roi_all_classes=False):
+        # roi_all_classes: every image has a region-of-interest mask (e.g. the optic disc) and is cropped
+        # around it. Otherwise label 0 (healthy) has no mask and gets a centre zoom, as on the UWF dataset.
+        self.roi_all_classes = roi_all_classes
         self.transform = transform
         self.dilation_percentage = dilation_percentage
         self.is_training = is_training
@@ -205,17 +209,18 @@ class BaseLesionZoomDataset(Dataset):
         if image is None:
             raise ValueError(f"Failed to load image: {img_path}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        if label == 0:
+        if label == 0 and not self.roi_all_classes:
             mask = np.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
             mask_original = mask.copy()
         else:
             binary_mask = safe_cv2_read(mask_path, cv2.IMREAD_GRAYSCALE)
             if binary_mask is None:
                 raise ValueError(f"Failed to load mask: {mask_path}")
-            mask_original = (binary_mask > 0).astype(np.uint8) * label
+            fill = 1 if self.roi_all_classes else label  # a label-0 region must stay non-zero
+            mask_original = (binary_mask > 0).astype(np.uint8) * fill
             if self.dilation_percentage > 0:
                 binary_mask = self._dilate_mask(binary_mask)
-            mask = (binary_mask > 0).astype(np.uint8) * label
+            mask = (binary_mask > 0).astype(np.uint8) * fill
         return image, mask, mask_original, label
 
 class FundusClsDatasetZoom(BaseLesionZoomDataset):
@@ -245,13 +250,15 @@ class PairedFundusDataset(Dataset):
         student_transform,
         dilation_percentage=0.5,
         student_train=True,
-        teacher_train=True
+        teacher_train=True,
+        roi_all_classes=False,
     ):
 
         self.ds_teacher = FundusClsDatasetZoom(
             df,
             transform=teacher_transform,
-            dilation_percentage=dilation_percentage  
+            dilation_percentage=dilation_percentage,
+            roi_all_classes=roi_all_classes,
         )
         self.ds_student = FundusClsDataset(
             df,
