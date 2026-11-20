@@ -35,7 +35,7 @@ from train_test_resnet_trim import (  # noqa: E402
     train_one_epoch,
     validate,
 )
-from utils.dataset import FundusClsDataset, prepare_dataframes, trim_fundus_black_border  # noqa: E402
+from utils.dataset import FundusClsDataset, prepare_dataframes, resolve_split_seed, trim_fundus_black_border  # noqa: E402
 from utils.kd_sweep import (  # noqa: E402
     build_teacher_model,
     resolve_experiment_paths,
@@ -297,6 +297,7 @@ def main(cfg: DictConfig) -> None:
         "dataset": OmegaConf.select(cfg, "dataset_name", default="uwf"),
         "experiment_tag": paths.experiment_tag,
         "random_seed": int(cfg.RANDOM_SEED),
+        "split_seed": resolve_split_seed(cfg),
         "student_resolution": student_resolution,
         "teacher_resolution": 512,
         "input_size": [1, 3, student_resolution, student_resolution],

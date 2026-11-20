@@ -110,6 +110,33 @@ class OfficialSplitTests(unittest.TestCase):
                 prepare_dataframes(_Cfg({"data_dir": tmp, "csv_file": "data.csv", "RANDOM_SEED": 42}))
 
 
+class SplitSeedTests(unittest.TestCase):
+    """split_seed fixes the patient split while RANDOM_SEED still changes training."""
+
+    def _csv(self, tmp):
+        rows = [{"image": f"PT{p:03d}_{i}.jpg", "patient": f"PT{p:03d}_{i}", "label": p % 4}
+                for p in range(80) for i in range(2)]
+        pd.DataFrame(rows).to_csv(os.path.join(tmp, "data.csv"), index=False)
+
+    def _test_patients(self, tmp, **cfg):
+        from utils.dataset import prepare_dataframes
+
+        _, _, test = prepare_dataframes(_Cfg({"data_dir": tmp, "csv_file": "data.csv", **cfg}))
+        return set(test["patient_id"])
+
+    def test_split_seed_fixes_the_split(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._csv(tmp)
+            fixed = [self._test_patients(tmp, RANDOM_SEED=s, split_seed=42) for s in (42, 43, 44)]
+            self.assertTrue(fixed[0] == fixed[1] == fixed[2])
+            self.assertEqual(fixed[0], self._test_patients(tmp, RANDOM_SEED=42))
+
+    def test_without_split_seed_the_split_follows_the_seed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self._csv(tmp)
+            self.assertNotEqual(self._test_patients(tmp, RANDOM_SEED=42), self._test_patients(tmp, RANDOM_SEED=43))
+
+
 class ConfigTests(unittest.TestCase):
     def test_uwf_default_and_refuge_config(self):
         from hydra import compose, initialize_config_dir
@@ -128,7 +155,12 @@ class ConfigTests(unittest.TestCase):
 
 
 class _Cfg(dict):
-    __getattr__ = dict.__getitem__
+    """Attribute access like an OmegaConf config; missing keys read as None, like OmegaConf.select."""
+
+    def __getattr__(self, key):
+        if key.startswith("__"):
+            raise AttributeError(key)
+        return self.get(key)
 
 
 if __name__ == "__main__":

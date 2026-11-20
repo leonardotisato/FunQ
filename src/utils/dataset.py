@@ -338,6 +338,14 @@ def _can_stratify(patients_df, label_col="label"):
     return (counts.min() >= 2) and (len(counts) >= 2)
 
 
+def resolve_split_seed(cfg):
+    """Seed of the patient split: ``split_seed`` if set (fixed split), otherwise ``RANDOM_SEED``."""
+    from utils.kd_sweep import cfg_select
+
+    split_seed = cfg_select(cfg, "split_seed", None)
+    return int(cfg.RANDOM_SEED if split_seed is None else split_seed)
+
+
 def _official_split(full_df, patient_col="patient_id"):
     """Use the dataset's own train/val/test assignment (a ``split`` column); the seed does not change it."""
     unknown = set(full_df["split"]) - {"train", "val", "test"}
@@ -371,13 +379,14 @@ def prepare_dataframes(
         full_df[patient_col] = (
             full_df["patient"].str.split("_").str[0].astype(str)
         )
+    split_seed = resolve_split_seed(cfg)
     patients = _unique_patients_with_label(full_df, patient_col, label_col)
 
     if _can_stratify(patients, label_col):
         splitter_test = StratifiedShuffleSplit(
             n_splits=1,
             test_size=test_rel,
-            random_state=cfg.RANDOM_SEED,
+            random_state=split_seed,
         )
         idx_trainval, idx_test = next(
             splitter_test.split(
@@ -389,7 +398,7 @@ def prepare_dataframes(
         splitter_test = GroupShuffleSplit(
             n_splits=1,
             test_size=test_rel,
-            random_state=cfg.RANDOM_SEED,
+            random_state=split_seed,
         )
         idx_trainval, idx_test = next(
             splitter_test.split(
@@ -409,7 +418,7 @@ def prepare_dataframes(
         splitter_val = StratifiedShuffleSplit(
             n_splits=1,
             test_size=val_rel_eff,
-            random_state=cfg.RANDOM_SEED,
+            random_state=split_seed,
         )
         idx_train, idx_val = next(
             splitter_val.split(
@@ -421,7 +430,7 @@ def prepare_dataframes(
         splitter_val = GroupShuffleSplit(
             n_splits=1,
             test_size=val_rel_eff,
-            random_state=cfg.RANDOM_SEED,
+            random_state=split_seed,
         )
         idx_train, idx_val = next(
             splitter_val.split(

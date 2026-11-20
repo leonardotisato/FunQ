@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 import re
 
+from utils.dataset import resolve_split_seed
 from utils.kd_sweep import TEACHER_SPECS, cfg_select, optional_tag
 
 
@@ -82,11 +83,12 @@ def run_provenance(cfg, teacher_spec, init_checkpoint, train_df, val_df, test_df
             "teacher_checkpoint_sha256": file_sha256(teacher_spec["checkpoint_path"]),
             "student_init_checkpoint_sha256": file_sha256(init_checkpoint),
             "experiment_tag": cfg_select(cfg, "experiment_tag", None),
-            "random_seed": int(cfg.RANDOM_SEED), "split_seed": int(cfg.RANDOM_SEED),
+            "random_seed": int(cfg.RANDOM_SEED), "split_seed": resolve_split_seed(cfg),
             "qat_seed": int(cfg.RANDOM_SEED),
             "fp32_seed": int(cfg.RANDOM_SEED) if source_report else None,
             "seed_protocol": ("RANDOM_SEED controls QAT randomness; the split is the dataset's official one"
-                              if official else "RANDOM_SEED controls patient split and QAT randomness"),
+                              if official else
+                              "RANDOM_SEED controls QAT randomness; split_seed controls the patient split"),
             "fp32_source_report": source_report,
             "fp32_source_report_sha256": file_sha256(source_report) if source_report else None,
             "data_csv": str(data_csv), "data_csv_sha256": file_sha256(data_csv),

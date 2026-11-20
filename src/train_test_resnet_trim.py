@@ -31,7 +31,7 @@ from torchvision import transforms as tv_transforms
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(__file__))
-from utils.dataset import prepare_dataframes, safe_pil_read, trim_fundus_black_border
+from utils.dataset import prepare_dataframes, resolve_split_seed, safe_pil_read, trim_fundus_black_border
 from utils.generals import progress_bar
 from utils.kd_sweep import (
     build_teacher_model,
@@ -376,6 +376,7 @@ def main(cfg: DictConfig) -> None:
         "dataset": OmegaConf.select(cfg, "dataset_name", default="uwf"),
         "experiment_tag": paths.experiment_tag,
         "random_seed": int(cfg.RANDOM_SEED),
+        "split_seed": resolve_split_seed(cfg),
         "student_resolution": student_resolution,
         "teacher_resolution": 512,
         "student_preprocess": {

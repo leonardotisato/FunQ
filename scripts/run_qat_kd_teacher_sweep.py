@@ -112,6 +112,8 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
         if (seeds is not None and seed not in seeds or teachers is not None and teacher not in teachers or
                 resolutions is not None and resolution not in resolutions):
             continue
+        # QAT fine-tunes on its FP32 source's split; older reports predate split_seed (split = seed).
+        split_seed = int(report.get("split_seed", seed))
         fp32_path = ((Path(fp32_models_dir) / expected) if fp32_models_dir else root / report["checkpoint"]).resolve()
         teacher_path = ((Path(teacher_models_dir) / Path(report["teacher_checkpoint"]).name)
                         if teacher_models_dir else root / report["teacher_checkpoint"]).resolve()
@@ -126,7 +128,8 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
             if output_checkpoint == fp32_path:
                 raise ValueError("QAT output must not replace the FP32 checkpoint")
             run = {"run_id": names["run_tag"], "architecture": arch, "resolution": resolution,
-                   "teacher": teacher, "seed": seed, "bits": bit, "experiment_tag": experiment,
+                   "teacher": teacher, "seed": seed, "split_seed": split_seed, "bits": bit,
+                   "experiment_tag": experiment,
                    "source_report": str(path), "fp32_checkpoint": str(fp32_path),
                    "teacher_checkpoint": str(teacher_path), "data_csv": str(data_csv),
                    "source_sha256": fingerprint(path), "fp32_sha256": fingerprint(fp32_path),
@@ -137,7 +140,7 @@ def plan_runs(source_sweep, *, root=ROOT, preset="full", bits=(8, 6, 4), seeds=N
                    "run_manifest": str(results_dir / "run_manifest.json"),
                    "log_file": str(root / "logs" / output_subdir / experiment / f"{names['run_tag']}.log")}
             run["fingerprint"] = hashlib.sha256(json.dumps(run, sort_keys=True).encode()).hexdigest()
-            overrides = {"RANDOM_SEED": seed, "student_resolution": resolution,
+            overrides = {"RANDOM_SEED": seed, "split_seed": split_seed, "student_resolution": resolution,
                          "teacher_mode": teacher, "teacher_checkpoint": str(teacher_path),
                          "experiment_tag": experiment, "warm_start_checkpoint": str(fp32_path),
                          "fp32_source_report": str(path), "sweep_run_fingerprint": run["fingerprint"],
